@@ -1,0 +1,12 @@
+[book]
+authors = ["Archibald Neil MacDonald"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Lean 4 The Win"
+git-repository-url = "https://github.com/aneilmac/lean4TheWin/tree/main/src"
+
+[output.html]
+mathjax-support = true
+
+[preprocessor.alerts]
