@@ -19,8 +19,14 @@ Draft Breakdown of intended chapters
     - The `#eval` command.
   - Learning outcome:
     - How to install lean
-    - Using `#eval`
+    - Using `#print`
     - Using the infoview.
+1. Expressions
+   `#eval` - in depth
+   - Nat type intro
+   - List syntax, functional syntax.
+   - Expressions, numbers
+   - Tuples
 1. Variables
    - Contents:
      `def` keyword

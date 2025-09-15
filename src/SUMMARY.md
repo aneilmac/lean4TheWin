@@ -1,5 +1,10 @@
 # Summary
 
-[This book is under construction](construction.md)
-
-- [Chapter 1](./chapter_1.md)
+- [Introduction](./introduction.md)
+  - [The Lean, Mean Solving Machine](./what_is_lean.md)
+  - [Getting Lean](./get_lean.md)
+- [One Small Step](./one_small_step.md)
+  - [Good and Eval](./eval.md)
+  - [Definitive defs](./defs.md)
+  - [It's just a theorem](./theorem.md)
+- [Cooking with induction](./induction.md)
