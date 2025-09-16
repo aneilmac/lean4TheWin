@@ -8,6 +8,6 @@
 > - `AND` Proposition
 > - `OR` Proposition
 > - `rcases` and `rintro` tactics
-> - ``sorry`
+> - `sorry`
 > - separating goals
 > - selecting goals

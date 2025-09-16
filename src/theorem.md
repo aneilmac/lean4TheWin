@@ -6,6 +6,7 @@
     - Takeaway should be: if a function can be defined, that is a proof.
 > - Introduce `theorem five_eq_five : 5 = 5 := rfl`
 > - Explain type is `Prop`
+> - `noncomputable` 
 > - Explain definition is `rfl` tactic.
 > - Prop vs Bool
 > - `=` vs `==`
