@@ -160,7 +160,7 @@ The audience will primarily be self-directed learners as such:
 1. Student knows about the `Exists` struct
 1. Student knows about `exists` tactic.
 
-# Chapter 12 
+### Chapter 12 
 
 1. Student knows about mathlib
 1. Student knows how to install mathlib.
