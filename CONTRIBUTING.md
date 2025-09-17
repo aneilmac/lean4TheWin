@@ -148,7 +148,7 @@ The audience will primarily be self-directed learners as such:
 1. Student understands `rcases` for goals
 1. Student understands inductive type proofs may be required
 
-## Chapter 11 
+### Chapter 11 
 
 1. Student understands there is a difference between constructivist and classical logic.
 1. Student understands that there is an opt-in classical mode.
