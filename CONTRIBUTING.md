@@ -39,7 +39,7 @@ The audience will primarily be self-directed learners as such:
 1. Student understands comments
 1. Students understands simple numeric expressions
 1. Student understands `#eval`
-1. Student learns of `Nat` type.
+1. Student learns of `Nat` type, `Int` type.
 1. Student understands how to write custom symbols.
    - Is given appendix table of common symbols in course.
      `\forall`, `\exists` `\<-`, `\.`, `alpha`, `\beta`

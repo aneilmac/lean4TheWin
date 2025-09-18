@@ -1,19 +1,30 @@
 # Summary
 
+# Welcome
+
 - [Introduction](./introduction.md)
-  - [The Lean, Mean Solving Machine](./what_is_lean.md)
-  - [Getting Lean](./get_lean.md)
-- [One Small Step](./one_small_step.md)
-  - [Good and Eval](./eval.md)
-  - [Definitive defs](./defs.md)
-  - [It's just a theorem](./theorem.md)
+- [The Lean, Mean Solving Machine](./what_is_lean.md)
+- [Get Lean](./get_lean.md)
+
+---
+
+# One Small Step
+
+
+- [Good and Eval](./eval.md)
+- [Definitive defs](./defs.md)
+- [It's just a theorem](./theorem.md)
 - [Nothing but the Truth](./truth.md)
-  - [Strutting Structs](./structs.md)
-  - [Apply Yourself](./apply.md)
-  - [Props to Propositions](./props.md)
-  - [Cooking with induction](./induction.md)
+- [Strutting Structs](./structs.md)
+- [Apply Yourself](./apply.md)
+- [Props to Propositions](./props.md)
+- [Cooking with induction](./induction.md)
 - [It's a big universe](./universe.md)
-  - [Types of Types](./types.md)
-  - [Classy Classes](./classes.md)
-  - [False explosions](./false.md)
-  - [Constructing the Classics](./classical_logic.md)
+- [Types of Types](./types.md)
+- [Classy Classes](./classes.md)
+- [False explosions](./false.md)
+- [Constructing the Classics](./classical_logic.md)
+
+---
+
+[Symbols](./symbols.md)

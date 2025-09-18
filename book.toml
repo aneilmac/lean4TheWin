@@ -3,10 +3,13 @@ authors = ["Archibald Neil MacDonald"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Lean 4 The Win"
+title = "Lean 4 the Win"
 git-repository-url = "https://github.com/aneilmac/lean4TheWin/tree/main/src"
 
 [output.html]
 mathjax-support = true
+additional-css = ["./theme/mdbook-admonish.css"]
 
-[preprocessor.alerts]
+[preprocessor.admonish]
+command = "mdbook-admonish"
+assets_version = "3.1.0" # do not edit: managed by `mdbook-admonish install`
