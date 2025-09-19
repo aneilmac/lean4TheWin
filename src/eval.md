@@ -34,11 +34,10 @@ Give the following a try:
 6
 ~~~
 
-`#eval` can take any _computable_ expression. (I'll cover noncomputable
-is later!) So the expression can be as complex as you like. 
-
-Lean follows [order of operations][order of operations] as you might
-expect. You may use parentheses to control the evaluation order.
+`#eval` takes _expressions_. 
+These can be as complex as you like. 
+For arithmetic, remember that
+Lean follows the [order of operations][order of operations]. 
 
 ~~~admonish info title=""
 ```lean
@@ -47,6 +46,8 @@ expect. You may use parentheses to control the evaluation order.
 11
 ~~~
 
+You may use parentheses to control the evaluation order.
+
 ~~~admonish info title=""
 ```lean
 #eval (1 + 2) * 4 / 2
@@ -54,38 +55,159 @@ expect. You may use parentheses to control the evaluation order.
 6
 ~~~
 
-## `Nat` Type
+## Strings
 
-So far, so good. But what about negative numbers? 
-The following might be a bit of a surprise:
+Of course, there's more to Lean than numbers!
+So let's look at another basic type: [`String`][String]. 
+Strings store text. Text is written between quotes (`"`).
 
-~~~admonish warning  title="Behavior of `Nat`"
+~~~admonish info  title=""
 ```lean
-#eval 3 - 4
+#eval "Hello World"
 ```
-0
+"Hello World"
 ~~~
 
-What gives? Shouldn't this be \\(-1\\)? Or heck, maybe 
-even  [\\(4294967295\\)][integer underflow]? Where is \\(0\\) coming from?
+Strings in Lean are [Unicode (UTF-8)][UTF8], 
+which means they can handle more than just the characters which 
+you see on your keyboard.
 
-The answer is that without specifying a _type_, Lean assumes that the type of 
- `3 - 4` is [`Nat`][Nat].
+~~~admonish info  title=""
+```lean
+#eval "Hello WØℝLΔ"
+```
+"Hello WØℝLΔ"
+~~~
 
-`Nat` stands for _Natural Number_. That is, the range of _nonnegative_ integers 
-from zero to infinity.
+As you'll discover, special unicode symbols are used extensively in Lean. 
+The Lean VSCode extension provides a quick way to write them.
+
+Try typing `\alpha`, in a `*.lean` file.
+The word will be replaced with the `α` symbol.
+
+In general `\` followed by a character sequence will produce a symbol.
+Here are some examples:
+
+- `\alpha` (or `\a`) becomes `α`.
+- `\beta` (or `\b`) becomes `β`. 
+- `\->` and `\<-` becomes `→` and `←` respectively.
+- And  [many more](./symbols.md)! 
+
+Strings can be _concatenated_ to produce a new string with the `++` operator,
+also known as 'append.'
+
+~~~admonish info  title=""
+```lean
+#eval "Goodbye" ++ "World"
+```
+"GoodbyeWorld"
+~~~
+
+Here I use trailing/leading spaces _within_ the quotes to stop words
+running into each other:
+
+~~~admonish info  title=""
+```lean
+#eval "Hello, " ++ "Bob! " ++ "H" ++ "o" ++ "w" ++ " are you?"
+```
+"Hello, Bob! How are you?"
+~~~
+
+So far, so simple, right?
+What happens if we write 
+`"Hello" ++ 4`?
+
+~~~admonish bug title="Type mismatch"
+```lean
+#eval "Hello" ++ 4
+```
+failed to synthesize  
+&nbsp;&nbsp;OfNat String 4  
+numerals are polymorphic in Lean, but the numeral `4` cannot be used in a context where the expected type is  
+&nbsp;&nbsp;String  
+due to the absence of the instance above
+~~~
+
+Zoinks! Lean is showing us our first _compilation error_, because
+the expression contained a problem. 
+Lean could not compile, because it doesn't understand how to turn `4` into a 
+string. To make sense of this error message, we have to
+understand what a type _is_.
+
+## `#check` for Types
+
+In Lean. Every expression has a type. A type tells us what an expression _is_.
+I am a human. `"Hello World"` is a `String`.  `1 + 1` is a number.
+
+Lean is very good at guessing what a type should be, so often we don't have 
+to write the type of an expression explicitly. But, sometimes we need to know
+the type that Lean guessed. How do we do this?
+
+Introducing: the  `#check` statement! You write `#check ...` just like
+`#eval`, but instead of evaluating the expression, `#check` gives you the 
+_type_ of the expression.
+
+
+~~~admonish info  title=""
+```lean
+#check "Hello World"
+```
+"Hello World" : String
+~~~
+
+~~~admonish info  title=""
+```lean
+#check "Hello" ++ "World"
+```
+"Hello" ++ "World" : String
+~~~
+
+So far, this seems fairly straightforward.
+`"Hello World"` is a `String`; and `"Hello" ++ "World"` is _also_ a string,
+because it results in the string `"HelloWorld"`.
+
+So, what about numbers?
+
+~~~admonish info  title=""
+```lean
+#check 4
+```
+4 : Nat
+~~~
+
+~~~admonish info  title=""
+```lean
+#check 5 * 5
+```
+5 * 5 : Nat
+~~~
+
+Not a gnat, but a `Nat`! 
+
+...What's a `Nat`?
+
+### `Nat`
+
+`Nat` is an abbreviation of _Natural Number_. 
+This is the range of _nonnegative_ integers from zero to infinity.
 
 \\[
 \texttt{Nat} = \\{0, 1, 2, 3, 4, \dots \\}
 \\]
 
-So, the only logical choice for `Nat` is to _clamp_ to \\(0\\).
-There is no number less than \\(0\\) in `Nat`, and there is no maximum to 
-underflow to, either!
+\\(0\\) is a `Nat`, \\(1\\) is a `Nat`, but \\(2.5\\) is _not_ a `Nat`, because
+it is not an integer! Likewise, \\(-5\\) is also not a `Nat` either, 
+because it's less than \\(0\\).
 
-While we can't have a number less than \\(0\\) when working with `Nat`,
-the only maximum limit is your computer's memory!
-(Or the heat death of the universe, whichever comes first.)
+Any whole number greater than zero is a natural number. 
+There really is no limit to the upper bound of `Nat`. A `Nat` expression can 
+be _any_ natural number, provided your computer has enough memory to store it.
+
+This behavior may be new to you if you're used to programming in other languages 
+(e.g. Javascript, _C#_), where most numeric types have a maximum. 
+In these other languages, numbers outside
+of the maximum are subject to [overflow][integer overflow] 
+(for a 64-bit `uint`,  \\(2^{64} + 1 = 0\\)). This doesn't happen with `Nat`.
 
 ~~~admonish info  title=""
 ```lean
@@ -98,6 +220,104 @@ the only maximum limit is your computer's memory!
 If you've worked with Python 3, you might already be used the idea of numbers 
 with [no maximum limit][python int].
 ```
+
+'That's great! I love really big numbers.' I hear you cry, 'But wait!
+What about _negative_ numbers? You said a `Nat`  can't be less than zero! 
+What happens with \\(3 - 4\\)?'
+
+Well, let's find out:
+
+~~~admonish warning  title="Clamping `Nat` underflow"
+```lean
+#eval 3 - 4
+```
+0
+~~~
+
+When given an expression that would result in a value less than \\(0\\), 
+`Nat` _clamps_ to \\(0\\). 
+
+~~~admonish info  title=""
+```lean
+#eval 3 - 5000
+```
+0
+~~~
+
+In many cases this is fine. There are plenty of problems out there that don't
+require negative numbers. But what if we need negative numbers?
+
+### Int
+
+When we give Lean a negative number as an expression, what type will it think
+that expression has?
+
+~~~admonish info  title=""
+```lean
+#check -3
+```
+-3 : Int
+~~~
+
+An `Int`! `Int` is an abbreviation of _Integer_. 
+
+`Int` is just like `Nat`, only there are _also_ an infinite number of negative
+integers below \\(0\\).
+
+
+\\[
+\texttt{Int} = \\{\dots, {-4}, {-3}, {-2}, {-1}, 0, 1, 2, 3, 4, \dots\\}
+\\]
+
+Lean was smart enough to know that `-3` isn't a `Nat`, so the next best thing
+is an `Int`.
+
+
+
+So, the only logical choice for `Nat` is to _clamp_ to \\(0\\).
+There is no number less than \\(0\\) in `Nat`, and there is no maximum to 
+underflow to, either!
+
+What gives? Shouldn't this be \\(-1\\)? Or heck, maybe 
+even  [\\(4294967295\\)][integer underflow]? Where is \\(0\\) coming from?
+
+The answer is that without specifying a _type_, Lean assumes that the type of 
+ `3 - 4` is [`Nat`][Nat].
+
+
+
+
+
+While we can't have a number less than \\(0\\) when working with `Nat`,
+the only maximum limit is your computer's memory!
+(Or the heat death of the universe, whichever comes first.)
+
+
+
+
+~~~admonish info
+You might be used to working with other programming languages, where implicit 
+number to string conversions are common! For example, in javascript, 
+`"4" + 2 = 42`, but confusingly, `"4" - 2 = 2`! In Javascript, `+` is used for
+adding _and_ concatenation! And when given a choice, Javascript assumes 
+concatenation first.
+
+Lean
+~~~
+
+
+`+` expects _types_ which can be added together. When you add together
+two incompatible types, the Lean compiler will give you an error.
+
+~~~admonish
+Try using the concat (`++`) operator to concat a `String` and `Nat`
+and see what happens.
+~~~
+
+
+
+
+
 
 Later on in this book, I'll introduce you to more number types, 
 such as `Int` and `Float`, which are not constrained in the same way as `Nat`.
@@ -153,84 +373,6 @@ Lean automatically knows this expression should return an `Int`, because
 ~~~
 -->
 
-## `String` Type
-
-The [`String`][String] type in Lean is for storing and manipulating text. 
-Strings are written between quotes (`"`).
-
-~~~admonish info  title=""
-```lean
-#eval "Hello World"
-```
-"Hello World"
-~~~
-
-Strings in Lean are [Unicode (UTF-8)][UTF8], 
-which means they accept more than just the symbols 
-than you see on your keyboard.
-
-~~~admonish info  title=""
-```lean
-#eval "Hello WØℝLΔ"
-```
-"Hello WØℝLΔ"
-~~~
-
-
-~~~admonish info
-As you'll discover, special unicode symbols are used extensively in Lean. 
-The Lean VSCode extension provides a quick way to write them.
-
-Try typing `\alpha`, followed by a space in a `*.lean` file, 
-then your text editor will replace this with the `α` symbol.
-This also works for `\beta`, `\forall`, `\r`, `\and`, etc, and many others.
-
-I have written a handy [symbols](./symbols.md) table for common unicode symbols 
-and their usage!
-~~~
-
-Strings can be _concatenated_ to produce a new string with the `++` operator.
-
-~~~admonish info  title=""
-```lean
-#eval "Goodbye" ++ "World"
-```
-"GoodbyeWorld"
-~~~
-
-Here I use trailing/leading spaces _within_ the quotes to stop words
-running into each other:
-
-~~~admonish info  title=""
-```lean
-#eval "Hello, " ++ "Bob! " ++ "H" ++ "o" ++ "w" ++ " Are you?"
-```
-"Hello, Bob! How Are you?"
-~~~
-
-So far, so simple, right? 
-
-But what happens if we write 
-`"Hello" ++ 3"`? Or `1 + "World"`?:
-
-~~~admonish bug title="Type mismatch"
-```lean
-#eval 4 + "Hello"
-```
-failed to synthesize  
-&nbsp;&nbsp;HAdd Nat String ?m.1
-~~~
-
-Zoinks! Lean is complaining it doesn't know how to add a `Nat` and a `String`
-type together. (We'll cover `HAdd` in more detail later.)
-
-`+` expects _types_ which can be added together. When you add together
-two incompatible types, the Lean compiler will give you an error.
-
-~~~admonish
-Try using the concat (`++`) operator to concat a `String` and `Nat`
-and see what happens.
-~~~
 
 ## Comments
 
@@ -284,6 +426,7 @@ grow more complex, and comments help us understand the _why_ of an operation.
 
 [#eval]: https://lean-lang.org/doc/reference/latest/Interacting-with-Lean/#Lean___Parser___Command___eval "#eval command"
 [order of operations]: https://en.wikipedia.org/wiki/Order_of_operations "Wikipedia: Order of Operations"
+[integer overflow]: https://cwe.mitre.org/data/definitions/190.html "CWE: Integer Overflow"
 [integer underflow]: https://cwe.mitre.org/data/definitions/191.html "CWE: Integer Underflow"
 [Nat]: https://lean-lang.org/doc/reference/latest/Basic-Types/Natural-Numbers/ "Nat definition in Lean 4"
 [Int]: https://lean-lang.org/doc/reference/latest/Basic-Types/Integers/#Int "Int defined in Lean 4"
