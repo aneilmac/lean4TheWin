@@ -1,16 +1,15 @@
-
-
-
-> [!WARNING]
-> TODO 
-> - Comments
-> - Introduce `#eval`
-> - Introduce expression: `+`, `*` `^`
-> - Introduce `Nat` type.
-> - Introduce List syntax `[1, 2, 3] ++ [4, 5, 6]`
-> - Introduce `List` type. 
-> - Introduce list built in-functions
-
+~~~admonish warning
+- [x] Introduce `#eval`
+- [x] Introduce `#check`
+- [x] Introduce expressions: `+`, `*` `^`
+- [x] Introduce `Nat` type.
+- [x] Introduce `Int` type.
+- [x] Introduce `String` and `++`.
+- [ ] Comments
+- [ ] Introduce List syntax `[1, 2, 3] ++ [4, 5, 6]`
+- [ ] Introduce `List` type. 
+- [ ] Introduce list built in-functions
+~~~
 
 # Good and Eval
 
@@ -23,17 +22,17 @@ and an infoview which shows the Lean elaborator at work.
 We're going to learn one of the most useful statements, [`#eval`][#eval]!
 
 When you type `#eval ...`, Lean will compile the line as code,
-and try to run it. The result will appear in the infoview. 
-Give the following a try:
+and try to _evaluate_ then line (a.k.a, run the code!). 
+The result will appear in the infoview. Give the following a try:
 
-~~~admonish info title=""
+~~~admonish example title=""
 ```lean
 #eval 3 + 4
 ```
 7
 ~~~
 
-~~~admonish info title=""
+~~~admonish example title=""
 ```lean
 #eval 4 ^ 2
 ```
@@ -41,7 +40,7 @@ Give the following a try:
 ~~~
 
 
-~~~admonish info title=""
+~~~admonish example title=""
 ```lean
 #eval 18 / 3
 ```
@@ -53,7 +52,7 @@ These can be as complex as you like.
 For arithmetic, remember that
 Lean follows the [order of operations][order of operations]. 
 
-~~~admonish info title=""
+~~~admonish example title=""
 ```lean
 #eval 1 + 3 * 4 - 2
 ```
@@ -62,7 +61,7 @@ Lean follows the [order of operations][order of operations].
 
 You may use parentheses to control the evaluation order.
 
-~~~admonish info title=""
+~~~admonish example title=""
 ```lean
 #eval (1 + 2) * 4 / 2
 ```
@@ -75,7 +74,7 @@ Of course, there's more to Lean than numbers!
 So let's look at another basic type: [`String`][String]. 
 Strings store text. Text is written between quotes (`"`).
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval "Hello World"
 ```
@@ -86,31 +85,33 @@ Strings in Lean are [Unicode (UTF-8)][UTF8],
 which means they can handle more than just the characters which 
 you see on your keyboard.
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval "Hello WØℝLΔ"
 ```
 "Hello WØℝLΔ"
 ~~~
 
-As you'll discover, special unicode symbols are used extensively in Lean. 
+~~~admonish info
+As you'll discover, special symbols are used extensively in Lean. 
 The Lean VSCode extension provides a quick way to write them.
 
 Try typing `\alpha`, in a `*.lean` file.
 The word will be replaced with the `α` symbol.
 
-In general `\` followed by a character sequence will produce a symbol.
+In general, `\` followed by a character sequence will produce a symbol.
 Here are some examples:
 
 - `\alpha` (or `\a`) becomes `α`.
 - `\beta` (or `\b`) becomes `β`. 
 - `\->` and `\<-` becomes `→` and `←` respectively.
 - And  [many more](./symbols.md)! 
+~~~
 
 Strings can be _concatenated_ to produce a new string with the `++` operator,
 also known as 'append.'
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval "Goodbye" ++ "World"
 ```
@@ -120,7 +121,7 @@ also known as 'append.'
 Here I use trailing/leading spaces _within_ the quotes to stop words
 running into each other:
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval "Hello, " ++ "Bob! " ++ "H" ++ "o" ++ "w" ++ " are you?"
 ```
@@ -145,31 +146,31 @@ due to the absence of the instance above
 Zoinks! Lean is showing us our first _compilation error_, because
 the expression contained a problem. 
 Lean could not compile, because it doesn't understand how to turn `4` into a 
-string. To make sense of this error message, we have to
+`String`. To make sense of this error message, we have to
 understand what a type _is_.
 
 ## `#check` for Types
 
 In Lean. Every expression has a type. A type tells us what an expression _is_.
-I am a human. `"Hello World"` is a `String`.  `1 + 1` is a number.
+`"Hello World"` is a `String`.  `1 + 1` is a number. Red is a color.
 
 Lean is very good at guessing what a type should be, so often we don't have 
-to write the type of an expression explicitly. But, sometimes we need to know
-the type that Lean guessed. How do we do this?
+to write the type of an expression explicitly. But sometimes we need to know
+the type Lean has guessed. How do we do this?
 
 Introducing: the  `#check` statement! You write `#check ...` just like
 `#eval`, but instead of evaluating the expression, `#check` gives you the 
 _type_ of the expression.
 
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #check "Hello World"
 ```
 "Hello World" : String
 ~~~
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #check "Hello" ++ "World"
 ```
@@ -182,14 +183,14 @@ because it results in the string `"HelloWorld"`.
 
 So, what about numbers?
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #check 4
 ```
 4 : Nat
 ~~~
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #check 5 * 5
 ```
@@ -217,7 +218,7 @@ Any whole number greater than zero is a natural number.
 There really is no limit to the upper bound of `Nat`. A `Nat` expression can 
 be _any_ natural number, provided your computer has enough memory to store it.
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval 2^64 + 1
 ```
@@ -230,7 +231,7 @@ What happens with \\(3 - 4\\)?'
 
 Well, let's find out:
 
-~~~admonish warning  title="Clamping `Nat` underflow"
+~~~admonish warning title="Clamping `Nat` underflow"
 ```lean
 #eval 3 - 4
 ```
@@ -241,7 +242,7 @@ As it turns out,
 when given an expression that would result in a value less than \\(0\\), 
 `Nat` _clamps_ to \\(0\\). 
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval 3 - 5000
 ```
@@ -257,7 +258,7 @@ work with negative numbers?
 Let's see what happens when we give Lean a negative number as an expression.
 What type will it have?
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #check -3
 ```
@@ -273,18 +274,30 @@ integers below \\(0\\).
 \texttt{Int} = \\{\dots, {-4}, {-3}, {-2}, {-1}, 0, 1, 2, 3, 4, \dots\\}
 \\]
 
-Lean is smart enough to know that \\(-3\\) isn't `Nat`, so the next best guess
-is \\(-3\\) must be an `Int`.
+Lean is smart enough to know that \\(-3\\) isn't `Nat`, so the next best is
+ `Int`.
 
-Great! So, how do tell Lean that the expression `3 - 4` should be an `Int` and 
-not a `Nat`?
+~~~admonish info
+Hold on! Didn't we just establish that the expression \\(4-3\\)
+had type `4-3 : Nat`?  
+Why is \\(-3\\), `-3 : Int`?
+
+Remember that `-` can represent a binary operator _and_ a unary operator.
+`3 - 4` is a binary operation (works on two inputs). 
+`-3` is a _unary_ operation (works on one input). 
+The unary  operation is _not_ defined for `Nat`, but is for `Int`, which is 
+why Lean chooses `Int` as the type of the expression.
+~~~
+
+So we know that `Int` exists, and we Lean will guess it when we use negative 
+integers. But how we tell Lean to treat \\(4\\) as `4 : Int`?
 
 ## Explicit typing
 
 Whenever you need tell Lean that an expression has a specific type, you 
 wrap the expression in parentheses, and add a `: Type` specifier.
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval (1 - 3 : Int)
 ```
@@ -293,7 +306,7 @@ wrap the expression in parentheses, and add a `: Type` specifier.
 
 You can add an explicit type to any part of the expression:
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval (1 : Int) - (3 : Int)
 ```
@@ -303,12 +316,49 @@ You can add an explicit type to any part of the expression:
 Lean is also smart enough to guess that when you mix `Nat` and `Int`, 
 the  expression's overall type must be `Int`.
 
-~~~admonish info  title=""
+~~~admonish example title=""
 ```lean
 #eval (1 : Int) - (3 : Nat)
 ```
 -2
 ~~~
+
+<!--
+### The Bad Append
+
+Let's consider our previous error again:
+
+~~~admonish bug title="Type mismatch"
+```lean
+#eval "Hello" ++ 4
+```
+failed to synthesize  
+&nbsp;&nbsp;OfNat String 4  
+numerals are polymorphic in Lean, but the numeral `4` cannot be used in a context where the expected type is  
+&nbsp;&nbsp;String  
+due to the absence of the instance above
+~~~
+
+With our new understanding of types, we can make an educated guess as to what
+went wrong here. `"Hello" ++ ?m` requires `?m` to be a `String`. 
+Lean tries to guess what type the expression `4` is. From context, `4` has to be
+a `String`, because that's the only type which makes sense when working with append.
+But Lean doesn't know how the expression `4` could have a type `String`, and so
+it throws an error.
+
+## Wrap-up
+
+Well done! You've learned what an expression is in Lean, and
+you can use `#eval` to to evaluate expressions.
+
+You've learned three new types: `Nat`, `Int`, and `String`, as well as
+a couple of operators that work on these types.
+
+You've learned how to explicitly define the type on an expression, and how to 
+use `#check` to see what Lean things the type of an expression is.
+
+That's a lot! Give yourself a pat on the back. Next, we're going to be looking
+at _functions_.
 
 <!--
 
@@ -411,38 +461,9 @@ Lean automatically knows this expression should return an `Int`, because
 -18446744073709551617
 ~~~
 
+#eva;
 
-## Comments
 
-Now that we're comfortable with `#eval`, I'm going to take a brief intermission
-to talk about _comments_.
-
-Comments in Lean are lines that start with `--`. 
-Comments are ignored by the Lean compiler.
-
-~~~admonish info title=""
-```lean
--- This line is ignored. I can type whatever I want!
-#eval 1
-```
-1
-~~~
-
-If we have something really big to say, writing `--` every line can be pretty laborious. We can make this easier with _multiline comments_. 
-Multiline comments start with `/-`, and end with `-/`
-
-~~~admonish info title=""
-```lean
-/-
-SHOPPING LIST:
-* Eggs (x12)
-* MILK (2 pints)
-* CANDLES (x300)
--/
-#eval 1 + 1
-```
-2
-~~~
 
 It's worth talking about comments now, because our examples are going to
 grow more complex, and comments help us understand the _why_ of an operation.

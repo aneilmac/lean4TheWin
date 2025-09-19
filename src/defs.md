@@ -5,5 +5,7 @@
 > - Introduce `def x := 5` keyword. 
 > - More on types
 > - Introduce `def add a b := a + b`
-> - Introduce `def add := fun a b -> a + b`
+> - Introduce `def add := fun a b -> a + b` (indexing vs named parameters)
 > - Introduce `#check`.
+> - Currying
+> - 

@@ -12,6 +12,8 @@
 
 
 - [Good and Eval](./eval.md)
+- [Let me List the Ways](./lists.md)
+- [Fun functions](./functions.md)
 - [Definitive defs](./defs.md)
 - [It's just a theorem](./theorem.md)
 - [Nothing but the Truth](./truth.md)
