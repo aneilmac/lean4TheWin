@@ -1,3 +1,17 @@
+
+
+
+> [!WARNING]
+> TODO 
+> - Comments
+> - Introduce `#eval`
+> - Introduce expression: `+`, `*` `^`
+> - Introduce `Nat` type.
+> - Introduce List syntax `[1, 2, 3] ++ [4, 5, 6]`
+> - Introduce `List` type. 
+> - Introduce list built in-functions
+
+
 # Good and Eval
 
 ## Using `#eval`
@@ -203,23 +217,12 @@ Any whole number greater than zero is a natural number.
 There really is no limit to the upper bound of `Nat`. A `Nat` expression can 
 be _any_ natural number, provided your computer has enough memory to store it.
 
-This behavior may be new to you if you're used to programming in other languages 
-(e.g. Javascript, _C#_), where most numeric types have a maximum. 
-In these other languages, numbers outside
-of the maximum are subject to [overflow][integer overflow] 
-(for a 64-bit `uint`,  \\(2^{64} + 1 = 0\\)). This doesn't happen with `Nat`.
-
 ~~~admonish info  title=""
 ```lean
 #eval 2^64 + 1
 ```
 18446744073709551617
 ~~~
-
-```admonish
-If you've worked with Python 3, you might already be used the idea of numbers 
-with [no maximum limit][python int].
-```
 
 'That's great! I love really big numbers.' I hear you cry, 'But wait!
 What about _negative_ numbers? You said a `Nat`  can't be less than zero! 
@@ -234,7 +237,8 @@ Well, let's find out:
 0
 ~~~
 
-When given an expression that would result in a value less than \\(0\\), 
+As it turns out,
+when given an expression that would result in a value less than \\(0\\), 
 `Nat` _clamps_ to \\(0\\). 
 
 ~~~admonish info  title=""
@@ -244,13 +248,14 @@ When given an expression that would result in a value less than \\(0\\),
 0
 ~~~
 
-In many cases this is fine. There are plenty of problems out there that don't
-require negative numbers. But what if we need negative numbers?
+This is a unique feature of `Nat`, and not always desirable. What if we need to
+work with negative numbers?
 
 ### Int
 
-When we give Lean a negative number as an expression, what type will it think
-that expression has?
+
+Let's see what happens when we give Lean a negative number as an expression.
+What type will it have?
 
 ~~~admonish info  title=""
 ```lean
@@ -264,14 +269,48 @@ An `Int`! `Int` is an abbreviation of _Integer_.
 `Int` is just like `Nat`, only there are _also_ an infinite number of negative
 integers below \\(0\\).
 
-
 \\[
 \texttt{Int} = \\{\dots, {-4}, {-3}, {-2}, {-1}, 0, 1, 2, 3, 4, \dots\\}
 \\]
 
-Lean was smart enough to know that `-3` isn't a `Nat`, so the next best thing
-is an `Int`.
+Lean is smart enough to know that \\(-3\\) isn't `Nat`, so the next best guess
+is \\(-3\\) must be an `Int`.
 
+Great! So, how do tell Lean that the expression `3 - 4` should be an `Int` and 
+not a `Nat`?
+
+## Explicit typing
+
+Whenever you need tell Lean that an expression has a specific type, you 
+wrap the expression in parentheses, and add a `: Type` specifier.
+
+~~~admonish info  title=""
+```lean
+#eval (1 - 3 : Int)
+```
+-2
+~~~
+
+You can add an explicit type to any part of the expression:
+
+~~~admonish info  title=""
+```lean
+#eval (1 : Int) - (3 : Int)
+```
+-2
+~~~
+
+Lean is also smart enough to guess that when you mix `Nat` and `Int`, 
+the  expression's overall type must be `Int`.
+
+~~~admonish info  title=""
+```lean
+#eval (1 : Int) - (3 : Nat)
+```
+-2
+~~~
+
+<!--
 
 
 So, the only logical choice for `Nat` is to _clamp_ to \\(0\\).
@@ -371,7 +410,6 @@ Lean automatically knows this expression should return an `Int`, because
 ```
 -18446744073709551617
 ~~~
--->
 
 
 ## Comments
@@ -413,16 +451,7 @@ grow more complex, and comments help us understand the _why_ of an operation.
 
 
 
-
-> [!WARNING]
-> TODO 
-> - Comments
-> - Introduce `#eval`
-> - Introduce expression: `+`, `*` `^`
-> - Introduce `Nat` type.
-> - Introduce List syntax `[1, 2, 3] ++ [4, 5, 6]`
-> - Introduce `List` type. 
-> - Introduce list built in-functions
+-->
 
 [#eval]: https://lean-lang.org/doc/reference/latest/Interacting-with-Lean/#Lean___Parser___Command___eval "#eval command"
 [order of operations]: https://en.wikipedia.org/wiki/Order_of_operations "Wikipedia: Order of Operations"
