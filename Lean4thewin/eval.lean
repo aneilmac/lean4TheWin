@@ -38,3 +38,20 @@ def double' : Nat → Nat := fun x => x * x
 
 def add : Nat → (Nat → Nat) := fun x ↦ fun y ↦ x + y
 #print add
+
+#check True  -- (True : Prop)
+#check False -- (False : Prop)
+#check True = False -- (True = True : Prop)
+
+#check (True : Bool)
+
+#eval True
+
+theorem five_eq_five : 5 = 5 := rfl
+
+theorem example_two : 3 + 5 * 4 = 4 * 5 + 3 := rfl
+
+theorem nat_rfl (x : Nat) : x = x := rfl
+#print nat_rfl
+
+theorem example_three : true && false == false && true := rfl

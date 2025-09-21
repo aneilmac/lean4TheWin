@@ -14,8 +14,9 @@
 - [Good and Eval](./eval.md)
 - [Let me List the Ways](./lists.md)
 - [Fun functions](./functions.md)
-- [Definitive defs](./defs.md)
-- [It's just a theorem](./theorem.md)
+- [It's Just a Theorem](./theorem.md)
+- [Rewriting the Script](./rewrite.md)
+<!-- - [Definitive defs](./defs.md)
 - [Nothing but the Truth](./truth.md)
 - [Strutting Structs](./structs.md)
 - [Apply Yourself](./apply.md)
@@ -25,7 +26,7 @@
 - [Types of Types](./types.md)
 - [Classy Classes](./classes.md)
 - [False explosions](./false.md)
-- [Constructing the Classics](./classical_logic.md)
+- [Constructing the Classics](./classical_logic.md) -->
 
 ---
 

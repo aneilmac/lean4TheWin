@@ -36,10 +36,15 @@ The audience will primarily be self-directed learners as such:
 
 ### Chapter 2
 
-1. Student understands comments
+1. Student understands `#eval` is to execute expressions.
 1. Students understands simple numeric expressions
-1. Student understands `#eval`
-1. Student learns of `Nat` type, `Int` type.
+1. Student understands simple string expressions
+1. Student understands all expressions have types.
+1. Student understands `#check` can be used to get expression type.
+1. Student introduced to _type errors_.
+1. Student learns of `Nat`, `Int` and `String` type.
+
+
 1. Student understands how to write custom symbols.
    - Is given appendix table of common symbols in course.
      `\forall`, `\exists` `\<-`, `\.`, `alpha`, `\beta`

@@ -4,6 +4,7 @@
 - [x] Student understands writing simple functions.
 - [ ] Student understands they can call `[1, 2].reverse`, and
 - [ ] Student understands lean file is executed in order.
+- [ ]  `id` function
 ~~~
 
 # Fun functions
