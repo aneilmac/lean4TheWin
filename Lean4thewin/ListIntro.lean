@@ -39,3 +39,14 @@ theorem my_theory {α β γ : Prop} (h : α -> β) (g: β -> γ) : (α -> γ) :=
   apply g
   apply h
   exact a
+
+
+def a := 15
+
+def b := 6
+
+def c := a * b
+
+def q := "Hello World"
+
+#eval q

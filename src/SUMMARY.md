@@ -12,8 +12,8 @@
 
 
 - [Good and Eval](./eval.md)
-- [Let me List the Ways](./lists.md)
 - [Fun functions](./functions.md)
+- [Let me List the Ways](./lists.md)
 - [It's Just a Theorem](./theorem.md)
 - [Rewriting the Script](./rewrite.md)
 <!-- - [Definitive defs](./defs.md)

@@ -21,9 +21,10 @@ and an infoview which shows the Lean elaborator at work.
 
 We're going to learn one of the most useful statements, [`#eval`][#eval]!
 
-When you type `#eval ...`, Lean will compile the line as code,
-and try to _evaluate_ then line (a.k.a, run the code!). 
-The result will appear in the infoview. Give the following a try:
+When you write `#eval ...`, Lean will compile the line,
+and try to _evaluate_ (a.k.a, run) the code!. 
+The result will appear in the infoview. Give the following a try. You should
+see the following results:
 
 ~~~admonish example title=""
 ```lean
@@ -47,10 +48,10 @@ The result will appear in the infoview. Give the following a try:
 6
 ~~~
 
-`#eval` takes _expressions_. 
-These can be as complex as you like. 
-For arithmetic, remember that
-Lean follows the [order of operations][order of operations]. 
+The code we pass to `#eval` is called an _expression_. 
+An expression can be as complex as you like. 
+(For arithmetic, remember that
+Lean follows the [order of operations][order of operations].)
 
 ~~~admonish example title=""
 ```lean
@@ -70,8 +71,9 @@ You may use parentheses to control the evaluation order.
 
 ## Strings
 
-Of course, there's more to Lean than numbers!
-So let's look at another basic type: [`String`][String]. 
+Expressions are more than just numbers. 
+An expression can be almost anything.
+Here's a basic _string_ expression.
 Strings store text. Text is written between quotes (`"`).
 
 ~~~admonish example title=""
@@ -82,8 +84,8 @@ Strings store text. Text is written between quotes (`"`).
 ~~~
 
 Strings in Lean are [Unicode (UTF-8)][UTF8], 
-which means they can handle more than just the characters which 
-you see on your keyboard.
+This means they can contain many different kinds of characters 
+(far more than what you see on your keyboard!)
 
 ~~~admonish example title=""
 ```lean
@@ -108,7 +110,7 @@ Here are some examples:
 - And  [many more](./symbols.md)! 
 ~~~
 
-Strings can be _concatenated_ to produce a new string with the `++` operator,
+Strings may be _concatenated_ to produce a new string with the `++` operator,
 also known as 'append.'
 
 ~~~admonish example title=""
@@ -118,8 +120,8 @@ also known as 'append.'
 "GoodbyeWorld"
 ~~~
 
-Here I use trailing/leading spaces _within_ the quotes to stop words
-running into each other:
+Here I can use trailing/leading spaces _within_ the quotes to stop words
+running together:
 
 ~~~admonish example title=""
 ```lean
@@ -145,23 +147,22 @@ due to the absence of the instance above
 
 Zoinks! Lean is showing us our first _compilation error_, because
 the expression contained a problem. 
-Lean could not compile, because it doesn't understand how to turn `4` into a 
-`String`. To make sense of this error message, we have to
-understand what a type _is_.
+To understand what this problem is, we have to understand expression _types_.
 
 ## `#check` for Types
 
-In Lean. Every expression has a type. A type tells us what an expression _is_.
-`"Hello World"` is a `String`.  `1 + 1` is a number. Red is a color.
+In Lean, every expression has a _type_.
+A type tells us what the expression _is_. `"Hello World"` is a `String`. 
+`1 + 1 * 5` is a number.
 
-Lean is very good at guessing what a type should be, so often we don't have 
-to write the type of an expression explicitly. But sometimes we need to know
-the type Lean has guessed. How do we do this?
+Lean is very good at guessing what an expression's type should be, 
+so we don't have to explicitly write the type out (most of the time). 
+But, sometimes we need to verify the type which Lean has guessed.
+How do we do this?
 
 Introducing: the  `#check` statement! You write `#check ...` just like
 `#eval`, but instead of evaluating the expression, `#check` gives you the 
 _type_ of the expression.
-
 
 ~~~admonish example title=""
 ```lean
@@ -197,25 +198,25 @@ So, what about numbers?
 5 * 5 : Nat
 ~~~
 
-Not a gnat, but a `Nat`! 
-
-...What's a `Nat`?
+This makes sense too. If `4` is a `Nat`, then `5 *5` must also be a `Nat`. 
+But `Nat` is a new word we have't seen before. What does `Nat` mean?
 
 ### `Nat`
 
 `Nat` is an abbreviation of _Natural Number_. 
-This is the range of _nonnegative_ integers from zero to infinity.
+A Natural Number is the range of _nonnegative_ integers from zero to infinity.
 
 \\[
 \texttt{Nat} = \\{0, 1, 2, 3, 4, \dots \\}
 \\]
 
-\\(0\\) is a `Nat`, \\(1\\) is a `Nat`, but \\(2.5\\) is _not_ a `Nat`, because
-it is not an integer! Likewise, \\(-5\\) is also not a `Nat` either, 
-because it's less than \\(0\\).
+- \\(0\\) is a `Nat`, 
+- \\(1\\) is a `Nat`, 
+- \\(2.5\\) is _not_ a `Nat`, because it is not an integer! 
+- \\(-5\\) is also not a `Nat`, because it's less than \\(0\\).
 
 Any whole number greater than zero is a natural number. 
-There really is no limit to the upper bound of `Nat`. A `Nat` expression can 
+There really is no upper limit for `Nat`. A `Nat` expression can 
 be _any_ natural number, provided your computer has enough memory to store it.
 
 ~~~admonish example title=""
@@ -229,7 +230,7 @@ be _any_ natural number, provided your computer has enough memory to store it.
 What about _negative_ numbers? You said a `Nat`  can't be less than zero! 
 What happens with \\(3 - 4\\)?'
 
-Well, let's find out:
+Let's find out with our trusty `#eval`:
 
 ~~~admonish warning title="Clamping `Nat` underflow"
 ```lean
@@ -240,7 +241,7 @@ Well, let's find out:
 
 As it turns out,
 when given an expression that would result in a value less than \\(0\\), 
-`Nat` _clamps_ to \\(0\\). 
+`Nat` expressions _clamp_ to \\(0\\). 
 
 ~~~admonish example title=""
 ```lean
@@ -249,14 +250,23 @@ when given an expression that would result in a value less than \\(0\\),
 0
 ~~~
 
-This is a unique feature of `Nat`, and not always desirable. What if we need to
-work with negative numbers?
+This is a unique feature of `Nat`, and not always desirable. 
+After all, what if we need to work with negative numbers?
 
-### Int
+### The `Int` Type
 
+When we need to work with numbers that can go into the negatives, instead of
+`Nat`, we may use _`Int`_.  `Int` is an abbreviation of _Integer_. 
 
-Let's see what happens when we give Lean a negative number as an expression.
-What type will it have?
+`Int` is like `Nat`, but there are an infinite number of negative
+integers below \\(0\\).
+
+\\[
+\texttt{Int} = \\{\dots, {-4}, {-3}, {-2}, {-1}, 0, 1, 2, 3, 4, \dots\\}
+\\]
+
+We can see that Lean correctly chooses `Int` when we ask Lean to evaluate a
+negative number.
 
 ~~~admonish example title=""
 ```lean
@@ -265,37 +275,27 @@ What type will it have?
 -3 : Int
 ~~~
 
-An `Int`! `Int` is an abbreviation of _Integer_. 
-
-`Int` is just like `Nat`, only there are _also_ an infinite number of negative
-integers below \\(0\\).
-
-\\[
-\texttt{Int} = \\{\dots, {-4}, {-3}, {-2}, {-1}, 0, 1, 2, 3, 4, \dots\\}
-\\]
-
-Lean is smart enough to know that \\(-3\\) isn't `Nat`, so the next best is
- `Int`.
-
-~~~admonish info
-Hold on! Didn't we just establish that the expression \\(4-3\\)
-had type `4-3 : Nat`?  
-Why is \\(-3\\), `-3 : Int`?
-
-Remember that `-` can represent a binary operator _and_ a unary operator.
-`3 - 4` is a binary operation (works on two inputs). 
-`-3` is a _unary_ operation (works on one input). 
-The unary  operation is _not_ defined for `Nat`, but is for `Int`, which is 
-why Lean chooses `Int` as the type of the expression.
-~~~
-
-So we know that `Int` exists, and we Lean will guess it when we use negative 
-integers. But how we tell Lean to treat \\(4\\) as `4 : Int`?
+How do we make Lean choose `Int` 
+as the type for expression `3-4`, rather than `Nat`? 
 
 ## Explicit typing
 
 Whenever you need tell Lean that an expression has a specific type, you 
-wrap the expression in parentheses, and add a `: Type` specifier.
+wrap the expression in parentheses, and add a `: Type` specifier. Like so:
+
+~~~admonish example title=""
+```lean
+#eval ("Hello World" : String)
+```
+"Hello World"
+~~~
+
+~~~admonish example title=""
+```lean
+#eval (1 - 3 : Nat)
+```
+0
+~~~
 
 ~~~admonish example title=""
 ```lean
@@ -304,7 +304,16 @@ wrap the expression in parentheses, and add a `: Type` specifier.
 -2
 ~~~
 
-You can add an explicit type to any part of the expression:
+You can add an explicit type specifier to _any_ sub-expression in the 
+expression.
+
+
+~~~admonish example title=""
+```lean
+#eval ("Hello " : String) ++ ("World" : String)
+```
+"Hello World"
+~~~
 
 ~~~admonish example title=""
 ```lean
@@ -313,7 +322,7 @@ You can add an explicit type to any part of the expression:
 -2
 ~~~
 
-Lean is also smart enough to guess that when you mix `Nat` and `Int`, 
+Lean is smart enough to guess that when you mix `Nat` and `Int`, 
 the  expression's overall type must be `Int`.
 
 ~~~admonish example title=""
@@ -322,6 +331,126 @@ the  expression's overall type must be `Int`.
 ```
 -2
 ~~~
+
+### Bringing it all together
+
+We have enough information to understand why `"Hello" ++ 4` failed.
+`"Hello"` has type `String`, and `4` has type `Nat`. These types cannot be 
+concatenated together! Append (`++`) can concatenate two strings, 
+but cannot concatenate a string and a number!
+
+This is known as _strong typing_. Lean is a strongly typed language because 
+every expression has a type, and certain operations only work with certain 
+combinations of types.
+(This entire concept is also what lets us prove theorems!)
+
+Later on, I'll discuss how to understand a _function_ type. Understanding 
+function types will allow you to know what are the valid inputs for an
+operation.
+
+## The `def` keyword
+
+It gets pretty repetitive writing `"Hello World"` all the time. 
+Wouldn't it be nice if we could use a shorthand? Well we can, with the
+`def` keyword!
+
+~~~admonish example title = ""
+```lean
+def h := "Hello World"
+
+#eval h
+```
+"Hello World"
+~~~
+
+`def` stands for _definition_. We are writing a new definition, named `h`. 
+The expression to the right of the assignment operator (`:=`) is the definition 
+of `h`.
+
+`def` is very flexible, and can be assigned any expression you like.
+
+~~~admonish example title = ""
+```lean
+def twentySomething := 5 * 5
+
+#eval twentySomething
+```
+25
+~~~
+
+Just like expressions, you can add an explicit type to a 
+definition by specifying the `: Type` _after_ the definition name, 
+and before the assignment operator (`:=`),
+like so:
+
+~~~admonish example title=""
+```lean
+def p : Int := 26
+```
+~~~
+
+
+Definitions can refer to each other and
+be used in any place an expression of the 
+same type is allowed:
+
+~~~admonish example title = ""
+```lean
+def one := 1
+
+def two : Nat := 2
+
+def three := two + one
+
+def five := 5
+
+#eval three * five * three * five + 5
+```
+230
+~~~
+
+Beware the following pitfall: in Lean, the _order of declaration_ matters.
+The following example fails because `c`
+is declared before `a` and `b`.
+
+~~~admonish bug title="Declaration Order"
+```lean 
+def c := a * b
+
+def a := 15
+
+def b := 6
+```
+Unknown identifier `a`
+~~~
+
+To fix the above snippet, I need to declare `c` **after** `a` and `b` like so:
+
+```lean 
+def a := 15
+
+def b := 6
+
+def c := a * b
+```
+
+This works! If we evaluate `c` we'd get \\(90\\).
+
+Another constraint on definitions is the name of a definition must be unique.
+Two definitions (in the same _scope_) cannot have the same name.
+
+~~~admonish bug title="Duplicate definition"
+```lean 
+def q := "Hello World"
+
+def q := 5
+```
+'q' has already been declared
+~~~
+
+This means you cannot replace or modify a definition after it has been 
+created. This is referred to as _immutability_. Definitions are immutable 
+(can't be changed.)
 
 <!--
 ### The Bad Append
