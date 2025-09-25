@@ -72,3 +72,19 @@ def sum_and_triple := fun x y z => (x + y + z) * 3
 
 
 def o'keeffe's := 42
+
+def foo : List Int := [1, 2, 3]
+
+
+def myFun (a b : Nat) : if a == b then String else Int :=
+    match a == b with
+    | true => "Hello"
+    | false => (42 : Int)
+
+
+def myFun' (a b : Nat) : (if a == b then String else Int) :=
+    match a == b with
+    | true => "Hello"
+    | false => (42 : Int)
+
+#eval myFun 4 3

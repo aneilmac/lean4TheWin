@@ -14,7 +14,7 @@ _functions_ (sometimes referred to as methods.)
 In Lean, functions take one or more inputs, and produce an output. 
 
 You may not have realized you've already being using functions in this tutorial! 
-The operators (`++`, `+`, `^`, ...) are functions under the hood. 
+The operators (`++`, `+`, `^`, ...) are all functions under the hood. 
 - Add (`+`) calls a function which adds two numbers together and
 produces a new number.
 - Append (`++`) calls a function which concatenates the 
@@ -28,8 +28,8 @@ Here is a simple example of a function which doubles the number you give it:
 def double := fun x => x * 2
 ```
 
-Like we saw in the last chapter, we can assign expressions to a definition.
-Here we assign a function to the definition named `double`.
+Here we create a definition named `double` which is a function which 
+multiples the argument by \\(2\\).
 
 The function is made of four parts:
 
@@ -39,7 +39,7 @@ The function is made of four parts:
    of this symbol is the function _body_.
 1. `x*2`, the function body. States we should multiply `x` by \\(2\\).
 
-Calling `double` is fairly easy.
+Invoking `double` is easy. We just need to give it a number:
 
 ~~~admonish example title=""
 ```lean
@@ -50,7 +50,7 @@ def double := fun x => x * 2
 10
 ~~~
 
-This works for any valid `Nat`.
+And we can use `double x` where-ever a `Nat` would be valid!
 
 ~~~admonish example title=""
 ```lean
@@ -59,21 +59,9 @@ This works for any valid `Nat`.
 18446744073709551616
 ~~~
 
-You may have noticed that unlike other programming languages, I do not need to 
-call a function using parentheses around the arguments (e.g. `double(32)`). 
-In Lean, we don't use parentheses - We just call the function name followed
-immediately by the arguments.
-
-That's not to say we can't use parentheses! 
-We may sometimes need to add parentheses around an argument to ensure 
-evaluation occurs in the correct order:
-
-~~~admonish example title=""
-```lean
-#eval double (double 6)
-```
-24
-~~~
+You may have noticed that unlike other programming languages, we do not need to 
+call a function with parentheses around the arguments (e.g. `double(32)`). 
+In Lean, we just write the arguments directly after the function name.
 
 ## Multiple arguments
 
@@ -115,13 +103,13 @@ def double := fun x => x * 2
 ```
 
 What is the type of `double`?  It must have a type because all expressions have
-a type. Well guess no more, I will add it explicitly!
+a type. The type of `double` is:
 
 ```lean
 def double : Nat -> Nat := fun x => x * 2
 ```
 
-To do this I have to introduce a new symbol: `->`, 
+Here I have to introduce a new symbol: `->`, called 
 the _function arrow_ (sometimes written as `→` (`\rightarrow`)).
 
 The function arrow tells us that the type of `double` is an expression that
@@ -140,18 +128,19 @@ We read the type of `sumThreeAndTriple` as a function that
 1. Takes a `Nat`.
 1. Produces a `Nat`.
 
-The final type in the chain is the "result" of the function, 
-while everything else are the arguments **in order**.
+As you can see, the final type in the chain of function arrows is always
+the "result" of the function; everything else are the arguments **in order**.
 
-Not everything has to be the same type, of course. 
-For example, here we define a function `pow` to be a function
-which takes an `Int` and a `Nat`, and produces an `Int`.
+So far, in all our examples the arguments same type. But arguments can be any 
+type! For example, here is a function `pow`, which takes an `Int` 
+and a `Nat`, and produces an `Int`.
 
 ```lean
 def pow : Int -> Nat -> Int := fun n r => n^r
 ```
 
-We could even swap around the order of arguments if we wanted:
+And if we change the order of the arguments, then we have to change the order in 
+the type signature:
 
 ```lean
 def pow' : Nat -> Int -> Int := fun r n => n^r
@@ -160,7 +149,8 @@ def pow' : Nat -> Int -> Int := fun r n => n^r
 ~~~admonish info
 A little functional programming style-tip: functional programmers sometimes
 append the prime symbol (`'`), at the end of a function name, to show that the
-function is a variation on some other similarly-named function. 
+function is a variation on some other similarly-named function.
+
 `'` is a valid symbol to use in a definition name, and can go anywhere. Like so:
 
 ```lean
@@ -168,61 +158,35 @@ def o'keeffe's := 42
 ```
 ~~~
 
-## Named parameters
+## Associativity 
 
-It becomes obvious very quickly that functions are very laborious to write out!
+Functions are _left associative_, which means arguments are evaluated 
+left-to-right.
 
+So let's say I wanted to write an expression which doubles a number, then 
+doubles it again. The following example would **fail**:
 
-```lean
-def sumThreeAndTriple' : Nat -> Nat -> Int -> Int := fun x y z => (x + y + z) * 3
+~~~admonish bug title=""
 ```
-
-The more arguments we add, the more difficult the function becomes to parse,
-and the more we lost track of what is going on. Luckily, in Lean, there is a 
-much shorter syntax:
-
-```lean
-def sumThreeAndTriple' (x : Nat) (y : Nat) (z: Int) : Int := (x + y + z) * 3
+#eval double double 6
 ```
-
-Much better! Both function are exactly the same, only we use _named_ parameters
-instead. Named parameters are placed between the name and the type of the 
-function definition.
-
-Notice that when we used named parameters `fun` is implied, 
-so we don't need to specify this keyword anymore. 
-In addition, we write the type of the function 
-only in terms of the return value!
-
-We can shorten this function _even further_. When you have several 
-named parameters of the same type in a row, you can group them together.
-
-```lean
-def sumThreeAndTriple' (x y : Nat) (z: Int) : Int := (x + y + z) * 3
-```
-
-This is the typical syntax for functions in Lean, as it's much easier to
-read and reason about. Just remember that the _type_ of `sumThreeAndTriple'`
-is still `Nat -> Nat -> Int -> Int`, even after we have compressed the 
-definition!
-
-
-## Functions
-
-`def` can also be used to define _functions_. You can add arguments like so:
-
-
-
-Here `x` is a an argument of double. We call it just like we called
-function in the previous chapter, and may use it wherever an expression
-of the given type is allowed.
-
-~~~admonish example title=""
-```lean
-#eval [double 0, double 1, double 2, double 3, double 4]
-```
-[0, 2, 4, 6, 8]
+Application type mismatch: The argument  
+&nbsp;&nbsp;double  
+has type  
+&nbsp;&nbsp;Nat → Nat  
+but is expected to have type  
+&nbsp;&nbsp;Nat  
+in the application  
+&nbsp;&nbsp;double double
 ~~~
+
+The reason this fails, is because Lean interprets this expression as:
+`(double double) 6`! The first `double` is complaining it is 
+expecting an argument of type `Nat`, but instead we are passing in an argument 
+of type `Nat -> Nat` (a.k.a, the second `double`)!
+
+To correct this, we simply add parentheses around an argument to ensure 
+evaluation occurs in the correct order:
 
 ~~~admonish example title=""
 ```lean
@@ -231,162 +195,72 @@ of the given type is allowed.
 24
 ~~~
 
-If we `#check` the type of `double` we see that Lean guessed `x` to 
-be a `Nat`, and the return type to also be `Nat`:
+## Named parameters
 
-~~~admonish example title=""
+The more arguments we add to a function, the more laborious it is 
+to write and to maintain. In the following example, is `y` a `Nat` or an `Int`? 
+You have to carefully scan the type signature and the named arguments to match
+them:
+
 ```lean
-#check double
+def complexFun : Nat -> Int -> Nat -> Int -> Int := fun w x y z => (x - z)^y^w
 ```
-double (x : Nat) : Nat
-~~~
 
-We can use our usual `( : Type)` syntax to tell Lean than `x` should
-be a different type.
+Luckily, in Lean, there is a better syntax called 
+_named arguments_. Let's take our `double` example:
 
-~~~admonish example title=""
 ```lean
-
-def double (x : Int) := x * 2
-
-#check double
+def double : Nat -> Nat := fun x => x * 2
 ```
-double (x : Int) : Int
-~~~
 
-Given that `x` is an `Int`, Lean guesses the type of the entire
-expression to be `Int`.
+This can be rewritten as:
 
-Again, we can specific all the arguments _and_ the return type if 
-we so wish. Here `double` takes a `Nat`, but return an `Int`.
-
-~~~admonish example title=""
 ```lean
-def double (x : Nat) : Int := x * 2
-
-#check double
+def double (x: Nat) : Nat := x * 2
 ```
-double (x : Nat) : Int
-~~~
 
-## Multiple arguments
+Both functions are exactly the same, only the latter is a more compressed
+version of the first. 
 
-Functions can take any number of arguments. 
+Notice that when we used named parameters `fun` is implied, 
+so we don't need to specify the `fun` keyword anymore. 
+In addition, instead of writing the whole function type, we can get away with 
+just writing the return type!
 
-~~~admonish example title=""
-```lean
-def add (x : Int) (y : Int) := x + y
+And, just like with expressions, Lean can guess an argument's type.
+In the case of `double` we can omit the type of `x` (and the return type of 
+`double`) entirely.
 
-#eval add 3 4
-```
-7
-~~~
-
-This can be quite wordy to type out! Lean does help here. Y can group
-all argument of the same type together with one `(: Type)`.
-
-~~~admonish example title=""
-```lean
-def addThree (x y z : Int) := x + y + z
-
-#eval addThree 3 4 7
-```
-14
-~~~
-
-## Exploring function types with `#print`
-
-We've seen `#eval` and `#check` to query Lean about an expression.
-
-There is an additional command in our toolbox now: `#print`. When used with definitions, _print_ will print to the infoview the entire definition.
-
-
-~~~admonish example title=""
 ```lean
 def double x := x * 2
-#print double
 ```
-def double : Nat → Nat := fun x ↦ x * 2
-~~~
 
-Yikes! This _kinda_ looks like our function we wrote called `double`. 
-But it looks like it has been mangled. Why does it look like that?
-
-Let's compare the definitions of `double` we know of so far:
+Here's another, more complex example:
 
 ```lean
--- Minimal definition, with types guessed by Lean.
-def double x := x * 2
-
--- Definition with explicit return type
-def double x : Nat := x * 2
-
--- Definition with explicit parameter type and return value.
-def double (x : Nat) : Nat := x * 2
-
--- Definition given to us by the `#print` function.
-def double : Nat → Nat := fun x ↦ x * 2
+def sumThreeAndTriple : Nat -> Nat -> Int -> Int := fun x y z => (x + y + z) * 3
 ```
 
-All these functions are _equivalent_. They are different ways of 
-writing the same thing. The final definition is the "true" definition
-used by Lean under the hood. Everything else is _syntactical sugar_, 
-nicer ways of writing `double` which are more human readable.
-
-First off, let's look at the type of `double`. The type is:
-`Nat → Nat`.
-
-First of we are introduced to a new symbol : `→`, 
-sometimes know as the function arrow. 
-(written as `\rightarrow`,`\->`, or just plain `->`). 
-We read `Nat → Nat` as a type that _takes_ a `Nat` and produces a `Nat`.
-
-And if we think about it, this makes sense! `double` has type `Nat → Nat`, while
-`double 5` has type `Nat`!
-
-~~~admonish info
-
-Another example is our definition of `add`:
+Using named parameters this becomes:
 
 ```lean
-def add (x y : Int) := x + y
+def sumThreeAndTriple (x : Nat) (y : Nat) (z: Int) : Int := (x + y + z) * 3
 ```
 
-The type of `add` is actually `Int -> Int -> Int`! 
-It is a function that takes two  `Int`s, and produces an `Int`.
-~~~
-
-Next, let's look at the definition to the right of `:=`
+Note that when we have multiple parameters of the same type in a row,
+we can group these together under the same explicit type:
 
 ```lean
-fun x ↦ x * 2
+def sumThreeAndTriple (x y : Nat) (z: Int) : Int := (x + y + z) * 3
 ```
 
-We are introduced to some new syntax again.
-This is what's known as a _lambda_ function.
+This compressed syntax is very typical in Lean, and is the favoured way of 
+writing functions (with a couple of exceptions we will learn about). 
+Just remember that the _type_ of `sumThreeAndTriple'`
+is still `Nat -> Nat -> Int -> Int`, even after we have compressed the 
+definition!
 
-lambda functions appear in different languages under different names:
-anonymous functions, closures, callbacks. But the idea is the same, it is a
-function expression without a name.
-
-Let's try and define `add_three_and_double` in terms of a lambda function.
-
-~~~admonish example title=""
-```lean
-def add_three_and_double := fun x y z => (x + y + z) * 2
-#check add_three_and_double
-```
-add_three_and_double (x y z : Nat) : Nat
-~~~
-
-Here, we've left out the type signature on `add_three_and_double` to let
-Lean guess it. Note that `#check` has prettified the type to make it look
-like:
-
-```lean
-def add_three_and_double (x y z : Nat) := (x + y + z) * 2
-```
-
+<!--
 ### Partial function application and currying
 
 The first question you might be asking yourself is: what use is knowing any of
@@ -468,3 +342,4 @@ Both of these types could be read as "a function which takes two `Nat`s and retu
 
 Neat, huh? We just omit the parentheses to be more human-readable.
 ~~~
+-->
