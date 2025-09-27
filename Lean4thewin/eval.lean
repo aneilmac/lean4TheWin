@@ -82,10 +82,6 @@ def myFun (a b : Nat) : if a == b then String else Int :=
     | false => (42 : Int)
 
 
-def myFun' (a b : Nat) : (if a == b then String else Int) :=
-    match a == b with
-    | true => "Hello"
-    | false => (42 : Int)
 
 #eval myFun 4 3
 
@@ -104,7 +100,28 @@ def myList := [1, 2, 3]
 
 #eval List.range' 1 100
 
-
 #eval if true then true else false
 
 #check Type
+
+def idType' {α : Type} (x : α) := x
+
+#check idType' (Type 2)
+
+def id' {α} (x : α) := x
+
+#check (∃ (x : Nat), 3*x < 3)
+#check (∀ (x : Nat), 0 ≤ x)
+#check 1 = 2
+
+#check Function.const
+
+--def const (a b : Nat) := a
+
+--def const.{u} {α : Sort u} (a b : α) := a
+
+--def const.{u} {α : Sort u} {β : Sort u} (a : α) (b : β) := a
+
+def const {α β} (a : α) (b : β) := a
+
+#eval const false Type
