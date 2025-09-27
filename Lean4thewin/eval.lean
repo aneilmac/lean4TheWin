@@ -88,3 +88,23 @@ def myFun' (a b : Nat) : (if a == b then String else Int) :=
     | false => (42 : Int)
 
 #eval myFun 4 3
+
+#print Nat
+
+#check and
+
+#check true == false
+
+#check true ^^ false
+
+def myList := [1, 2, 3]
+
+
+#check List.range
+
+#eval List.range' 1 100
+
+
+#eval if true then true else false
+
+#check Type

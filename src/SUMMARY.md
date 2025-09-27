@@ -13,11 +13,12 @@
 
 - [Good and Eval](./eval.md)
 - [Fun functions](./functions.md)
+- [Implict Implications](./implicit.md)
+- [Nothing but the Truth](./truth.md)
 - [Let me List the Ways](./lists.md)
 - [It's Just a Theorem](./theorem.md)
 - [Rewriting the Script](./rewrite.md)
 <!-- - [Definitive defs](./defs.md)
-- [Nothing but the Truth](./truth.md)
 - [Strutting Structs](./structs.md)
 - [Apply Yourself](./apply.md)
 - [Props to Propositions](./props.md)

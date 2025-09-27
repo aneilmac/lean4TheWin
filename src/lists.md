@@ -88,8 +88,10 @@ In fact, `[1, 2, 3]` is the _exact same_ as writing `1 :: 2 :: 3 :: []`, with
 
 ## List Type
 
-What is the type of list? This changes based on the
-contents of the list.
+We are always interested in types in Lean!
+What is the type of list?
+Well it actually changes _based on the
+contents of the list._
 
 ~~~admonish example title=""
 ```lean
@@ -113,29 +115,27 @@ Lists in lean are _homogeneous_, they can only ever contain expressions of a
 single type.
 (Just like how you might expect a shopping list to contain only shopping - and not, say, the names of former U.S. presidents.)
 
-If we try a `#check List` we get a funny type signature:
+When we read the type `List α`, we read it as a List of
+elements of type `α`. The list can _only_ contain elements
+of type `α`.
 
-~~~admonish example title=""
+For example, the following will fail:
+
+~~~admonish bug title="Heterogeneous list error"
 ```lean
-#check List
+def myList := [1, 2, 3]
+
+#check ["A", "B", "C"] ++ myList
 ```
-List.{u} (α : Type u) : Type u
+failed to synthesize  
+&nbsp;&nbsp;HAppend (List String) (List Nat) ?m.8
 ~~~
 
-In later chapters I will cover the meaning of `{u}` and `Type u`,
-which have special meaning in lean's type system.
+`["A", "B", "C"]` is a `List String`, and `myList` is a 
+`List Nat`. Lean does not know what the output `List α`
+should be, and borks out!
 
-For now, let's pretend these elements don't exist and hone in on the following part:
-
-```lean
-List α
-```
-
-If you think `α` looks similar to a named argument in a function
-declaration, you'd be right! `List` is a function that takes 
-an argument `α`, with `α` being the _type_ that a `List` can hold.
-
-This is also why the following code fails:
+Here is another example of Lean failing to guess an appropriate `α`:
 
 ~~~admonish bug title="Ambiguous empty list"
 ```lean
@@ -158,9 +158,114 @@ for `α`.
 []
 ~~~
 
+~~~admonish info
+It may seem a bit strange that Lean needs to know the full type of `[]` to 
+be able to evaluate `[]`. 
+After all, an empty list is just an empty list, right?
+
+Yes! And in theorem proving, we likely could get away with this, but
+`#eval` requires a type to be _computable_.
+In Lean, not all types are computable, and Lean needs proof that
+the contents of a list _can_ be evaluated, even when the list is empty!
+~~~
+
+## A note on namespaces
+
+Namespaces are a way of neatly grouping related functions together, so that they
+are easy to find and access. 
+
+To access a function in a namespace we write out the name of the namespace,
+followed by a dot (`.`), followed by the function name. E.g. 
+`Namespace.function`.
+
+Often, when we have functions related to a type (e.g. `Nat` or `List`), the 
+namespace is the type's name.
+
+So for example, instead of writing `(3 + 5 : Nat)`, we could write, 
+`Nat.add 3 5`. `add` is the function, and `Nat` is the namespace that `add`
+lives in! (In fact `Nat.add` _is_ the function Lean calls when we write
+`3 + 5`!)
+
+~~~admonish info
+Previously I said that you cannot have two definitions with the same name, but
+this isn't entirely true. You can have definitions with the same name, if they
+live in separate namespaces! This is why both an `Int.add` and `Nat.add` exist. 
+~~~
+
+With the VSCode lean extension try writing `List.` then hit `Ctrl+Enter` on your
+keyboard. You'll see the _autocomplete_ suggest all the theorems and functions
+found in the `List` namespace! You can scroll the suggestions with the up and
+down arrow keys. You can inspect the type signatures of these functions, and
+read the documentation provided to try and make sense of them.
+
+But often, this can be overwhelming, and we haven't even
+covered the theorems in the `List` namespace yet! 
+For now, let's focus on some of the simpler `List` functions. 
+
+## Range
+
+If I were to type out a list containing the numbers \\(1\\) 
+to \\(100\\), (`[1, 2, 3, 4...]`) I'd probably give up.
+Luckily, there is a function that does this for us called `List.range`
+
+~~~admonish example title=""
+```lean
+#check List.range
+```
+List.range (n : Nat) : List Nat
+~~~
+
+You should be able to understand this type signature 
+after reading the previous chapter. `List.range` takes a `Nat`, and produces
+a `List Nat`.
+
+
+~~~admonish example title=""
+```lean
+#eval List.range 100
+```
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+ 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
+ 92, 93, 94, 95, 96, 97, 98, 99]
+~~~
+
+Ah, but wait a second! `List.range` counts _ordinaly_ it counts 100 numbers starting from \\(0\\). 
+I wanted to start from \\(1\\)! Luckily there is a variant: `List.range'`,
+which takes as the first parameter, the starting number.
+
+~~~admonish example title=""
+```lean
+#eval List.range' 1 100
+```
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+ 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
+ 92, 93, 94, 95, 96, 97, 98, 100]
+~~~
+
+## Filter
+
+Let's say we wanted a list of all numbers, from `1` to `100`, but we wanted
+only those numbers that were multiples of \\(7\\) or \\(5\\). How might we do
+this?
+
+There is a `List` function which allows us to filter the contents of a list. 
+Let's take a look.
+
+~~~admonish example title=""
+```lean
+#check List.range
+```
+List.range (n : Nat) : List Nat
+~~~
+
+List.filter.{u} {α : Type u} (p : α → Bool) (l : List α) : List α
+
 
 
 <!--
+
 ~~~admonish example title=""
 ```lean
 #eval [2, 4, 6, 8] ++ [] -- What do you think this will do?
@@ -221,17 +326,6 @@ due to the absence of the instance above
 
 Likewise, Lean cannot append two lists of different types either! 
 Because then, what would the type of the resulting expression be?
-
-~~~admonish bug title="Another heterogeneous list error"
-```lean
-#check ["A", "B", "C"] ++ [1, 2, 3]
-```
-failed to synthesize  
-&nbsp;&nbsp;OfNat String 1  
-numerals are polymorphic in Lean, but the numeral `1` cannot be used in a context where the expected type is   
-&nbsp;&nbsp;String  
-due to the absence of the instance above
-~~~
 
 And _this_ is why `#eval [2, 4, 6, 8] ++ []` works, and `#eval []` doesn't!
 Lean _knows_ that the empty List in the former expression must be a 

@@ -260,6 +260,8 @@ Just remember that the _type_ of `sumThreeAndTriple'`
 is still `Nat -> Nat -> Int -> Int`, even after we have compressed the 
 definition!
 
+
+
 <!--
 ### Partial function application and currying
 
