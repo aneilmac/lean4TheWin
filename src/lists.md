@@ -18,11 +18,10 @@ name. Will help in future.
 
 # Let me List the Ways
 
-So far you've being doing great! You've learned about `#eval`, expressions,
-types, and the syntax of functions in Lean. 
+We've been looking at some advanced concepts, but so far, 
+all our examples have been working with `Nat`, `Int`, `String` and `Bool`. 
+Before we jump into theorem proving, it's worth looking at another useful type.
 
-But so far, I've been limiting you to only working with `Nat` and `Int`, with
-a couple of `String` examples.
 
 This chapter we're going to cement our understanding of functions by 
 introducing a new in Lean: `List`.
@@ -115,7 +114,22 @@ Lists in lean are _homogeneous_, they can only ever contain expressions of a
 single type.
 (Just like how you might expect a shopping list to contain only shopping - and not, say, the names of former U.S. presidents.)
 
-When we read the type `List α`, we read it as a List of
+Let's see what happen when we check `List` type.
+
+~~~admonish example title=""
+```lean
+#check List
+```
+List.{u} (α : Type u) : Type u
+~~~
+
+From reading the pervious chapters, you will be familiar with the syntax here.
+But it's a new combination of things we've seen!
+
+`List` takes a type argument `α`. And the universe level 
+of `List α` is dependent on the universe level of type `α`.
+
+We should read `List α`, to mean a List of
 elements of type `α`. The list can _only_ contain elements
 of type `α`.
 
@@ -163,8 +177,6 @@ It may seem a bit strange that Lean needs to know the full type of `[]` to
 be able to evaluate `[]`. 
 After all, an empty list is just an empty list, right?
 
-Yes! And in theorem proving, we likely could get away with this, but
-`#eval` requires a type to be _computable_.
 In Lean, not all types are computable, and Lean needs proof that
 the contents of a list _can_ be evaluated, even when the list is empty!
 ~~~
@@ -255,13 +267,302 @@ Let's take a look.
 
 ~~~admonish example title=""
 ```lean
-#check List.range
+#check List.filter
 ```
-List.range (n : Nat) : List Nat
+List.filter {α} (p : α → Bool) (l : List α) : List α
 ~~~
 
-List.filter.{u} {α : Type u} (p : α → Bool) (l : List α) : List α
+We should read this as `List.filter` takes a filter function `p : α → Bool`
+that returns `true` or `false`, and an input list `l : List α`.
+All elements in `l` are tested against `p`, and the newly returned list 
+contains only those elements in `l` where `p` returns true.
 
+Let's quickly consider the type signature of `List.filter`:
+
+~~~admonish example title=""
+```lean
+{α : Type u} → (α → Bool) → List α → List α
+```
+~~~
+
+We've not seen this type signature before, 
+you should beware that this is very different to
+
+~~~admonish bug title=""
+```lean
+{α : Type u} → α → Bool → List α → List α
+```
+~~~
+
+- The former type signature takes two args: a `(α → Bool)` and a `List α`.
+- The latter type signature takes three args: a `α`, a `Bool`, and a `List α`! 
+
+The parentheses is important! It completely changes the meaning.
+
+So here's a couple of example usages of `List.filter`:
+
+Here, we only return true if `x == 0`, so we should only see a list of `[0]`
+
+~~~admonish example title=""
+```lean
+#eval List.filter (fun x => x == 0) (List.range 10)
+```
+[0]
+~~~
+
+Here, we always return false, meaning we should only ever see an empty list:
+
+~~~admonish example title=""
+```lean
+#eval List.filter (fun _ => false) (List.range 100)
+```
+[]
+~~~
+
+And the opposite, returning true, means both lists are always the same:
+
+~~~admonish example title=""
+```lean
+#eval List.filter (fun _ => true) (List.range 10)
+```
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+~~~
+
+The `id` function as we know just returns the argument it's given, so if we
+use this on a list of booleans, we'll only get the `true` elements back:
+
+~~~admonish example title=""
+```lean
+#eval List.filter id [true, false, true, true, false, false, false]
+```
+[true, true, true]
+~~~
+
+We asked earlier, how to _only_ get those elements which were multiples of 
+\\(5\\) or \\(7\\).
+
+~~~admonish info
+From other programming languages you may be familiar with the `%` operator,
+know as modulo. Modulo tells us the _remainder_ of a division when working
+with integers. `7 / 5` is \\(1\\) (rounded down), 
+and `7 % 5` is \\(2\\) (remainder of `7 / 5`).
+~~~
+
+~~~admonish example title=""
+```lean
+#eval List.filter (fun x => x % 5 == 0 || x % 7 == 0) (List.range 100)
+```
+[0, 5, 7, 10, 14, 15, 20, 21, 25, 28, 30, 35, 40, 42, 45, 49, 50, 55, 56, 60, 63, 65, 70, 75, 77, 80, 84, 85, 90, 91,
+ 95, 98]
+~~~
+
+## Partial function application and currying
+
+Recapping what was said earlier, imagine we have a function:
+which takes some `α`, some `β`, and produces some `γ`:
+
+```lean
+α -> β -> γ
+```
+
+This is very different from this type signature
+which takes an `(α -> β)`, and produces some `γ`.
+
+```lean
+(α -> β) -> γ
+```
+
+But what about _this_ variant:
+
+```lean
+α -> (β -> γ)
+```
+
+Here we have a function that takes an `α`, and returns a function of the form
+`(β -> γ)`.
+
+You may be surprised to learn that `α -> (β -> γ)`, and `α -> β -> γ` **are the
+same type signature**!
+
+Here's an example.
+
+~~~admonish example title=""
+```lean
+def add : Nat -> Nat -> Nat := fun x y => x + y
+#check add 5 -- What is the type signature of this?
+```
+add 5 : Nat → Nat
+~~~
+
+You _might_ have expected Lean to throw a compiler error at you 
+(most programming langues would), but instead Lean has given you a new function 
+signature: `Nat → Nat`! A type which takes a `Nat` and produces a `Nat`.
+
+~~~admonish example title=""
+```lean
+def add : Nat -> Nat -> Nat := fun x y => x + y
+def addFive := add 5
+#eval addFive 8
+```
+13
+~~~
+
+In the new function `addFive`, it's like Lean has stored our original argument,
+and is now waiting for the remaining arguments to complete the function 
+signature!
+
+```lean
+#eval addFive 0 -- Returns 5
+#eval addFive 2 -- Returns 7
+#eval addFive 50 -- Returns 55
+```
+
+This is called function Currying after Howard Curry, who first came up with this
+concept. Instead of thinking of a function as taking multiple arguments, in 
+Lean, every function really takes just a single argument, and returns a new
+function which takes the remainder.
+
+This means that the following two calls are equivalent:
+
+```lean
+add 5 8 
+(add 5) 8
+```
+
+And the definition of `add` could be rewritten as:
+
+```lean
+def add' : Nat → (Nat → Nat) := fun x => fun y => x + y
+```
+
+There's absolutely no difference in calling it!
+
+~~~admonish example title=""
+```lean
+#eval add' 5 8
+```
+13
+~~~
+
+This is an incredible feature of Lean, in that we can use partially applied 
+functions to create new functions. Let's go back to our filter example.
+
+Previously, we showed filter function which would always return `true`,
+producing the original list
+
+~~~admonish example title=""
+```lean
+#eval List.filter (fun _ => true) (List.range 10)
+```
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+~~~
+
+This can be rewritten in terms of `Function.const: α -> β -> α` (you should
+remember `const` from the previous chapter).
+
+~~~admonish example title=""
+```lean
+#eval List.filter (Function.const true) (List.range 10)
+```
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+~~~
+
+Here, `Function.const true : β -> Bool`, perfectly fits the type signature 
+of `p : α -> Bool`. It doesn't matter that `α` `β` have different names!
+`α` is any `Type u` and `β` is any `Type u`. 
+How they were named when writing the signatures makes no difference.
+
+Going a step further. Let's consider we have a function on `List Nat`, which
+produces a new list, returning only those numbers which are even:
+
+```lean
+def evens (l : List Nat) : List Nat := List.filter (fun x => x % 2 == 0) l
+```
+
+We can take advantage of the fact of partial function application on 
+`List.filter`, to rewrite this as:
+
+```lean
+def evens' := List.filter (fun x => x % 2 == 0)
+```
+
+Here, `evens'` is defined as a partial application `List.filter`. 
+When the final input parameter is provided, you'll get the even-number list!
+
+<!--
+
+The first question you might be asking yourself is: what use is knowing any of
+this? I understand `add` has a type signature of `Nat -> Nat -> Nat`? But what
+practical use is that to me?
+
+Having a strong understanding of function arrows is important for theorem
+proving. It also helps explain to use a surprising behavior of Lean!
+
+
+
+
+
+Let's see what happens when we call `add 5` as a function.
+
+~~~admonish example title=""
+```lean
+def add (x y : Nat) := x + y
+def addFive := add 5 -- Definition becomes fun y ↦ 5 + y
+#eval addFive 8
+```
+13
+~~~
+
+That's new! And very powerful. And it works for any `Nat`.
+
+```lean
+#eval addFive 0 -- Returns 5
+#eval addFive 2 -- Returns 7
+#eval addFive 50 -- Returns 55
+````
+
+ Instead of giving you a
+compiler error, if you call a function with 
+_less_ arguments than required, what is returned is a _new_ function that expects the remaining
+arguments to be set.
+
+This is called function Currying after Howard Curry, who first came up with this
+concept. (TODO double check)
+
+```lean
+-- This means that these two operations are the exact same!
+add 5 8 
+(add 5) 8
+```
+
+~~~admonish info
+To expand on the  idea of currying, imagine every function is restricted to only take a single argument.
+To call `add x y`, `add x` must return a function which
+takes `y`,  
+which in-turn returns `x + y`.
+
+If we wanted to, we could write `add` like this:
+
+```lean
+def fun_add : Nat → (Nat → Nat) := fun x ↦ fun y ↦ x + y
+```
+
+In-fact, this is _exactly_ the original definition of `add`. Try calling `#print fun_add` and see that Lean 
+prints!
+
+This is a powerful property. `fun_add` and `add` really are teh same. Even the type signatures are the same:
+
+```lean 
+Nat -> (Nat -> Nat)
+Nat -> Nat -> Nat
+```
+
+Both of these types could be read as "a function which takes two `Nat`s and returns a `Nat`", _or_ as 
+"a function which takes a `Nat` and returns a function which takes a `Nat` and returns a `Nat`"! 
+
+Neat, huh? We just omit the parentheses to be more human-readable.
+~~~
+-->
 
 
 <!--

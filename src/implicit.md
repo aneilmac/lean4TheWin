@@ -185,7 +185,8 @@ As we know by now Lean is good at guessing types. Can't Lean just guess `α`?
 And the answer is: Yes! 
 
 In Lean you can use something call the hole term  `_` in place of an
-argument. This tells Lean to guess what value an argument should have. 
+argument. This tells Lean to guess what value an argument should have
+(literally: fill this hole with what you think!) 
 If arguments are dependent on each other (like how `x` is dependent on `α`), 
 Lean's type resolver can often guess what `α` should be based on `x` alone!
 
@@ -215,9 +216,9 @@ false
 Our `idType` function is okay, but it could be much better.
 Having to type a wildcard (`_`) every time is inconvenient when calling `idType`.
 Ideally it would be great if we could write `idType` in such a way that we could
-say "this parameter is implied, the caller shouldn't need to provide it"
+say "this parameter is implied, the caller shouldn't have to ever provide it."
 
-And the Lean developers think so too, we can make `α` implied by changing our
+Lean thinks so too! We can make `α` implied by changing our
 parentheses to curly braces, like so:
 
 ~~~admonish example title=""
@@ -270,7 +271,7 @@ idType' {α : Type} (x : α) : α
 ~~~
 
 We've actually artificially restricted ourselves here. Look at `α` closely, 
-`α` must be a member of `Type`, a.k.a `Type 0`.  So it's going to fail say,
+`α` must be a member of `Type`.  So it's going to fail say, 
 for members of `Type 3`!
 
 ~~~admonish bug title="Bad Type"
@@ -288,16 +289,16 @@ of sort `Type` in the application
 ~~~
 
 This is unfortunate. We wanted our `id` function to be _truly_ generic over 
-anything. How do we make it accept _any_ universe?
+anything. How do we make it accept expressions of _any_ universe?
 
 ### Sorts
 
 Previously, I mentioned Lean relies on dependent type theory, which gives
 us this hierarchy of types, sometimes known as universes or _sorts_.
-Every universe has a _level_ (let's call this `u` for now), that is a natural
+Every universe has a _level_ which is a natural
 number.
 
-In Lean, `Type u` is an alias of `Sort u + 1`.
+In Lean, the universe level `u` in `Type u` is an alias of `Sort u + 1`.
 
 | Sort | Type | Alias|
 |------|------|------|
@@ -324,9 +325,9 @@ graph TD;
     one((1))-->Nat;
     two((2))-->Nat;
     three((3))-->Nat;
-    Nat-->Type;
-    Int-->Type;
-    String-->Type;
+    Nat(Nat)-->Type;
+    Int(Int)-->Type;
+    String(String)-->Type;
     Sort0["Sort 0 
           (Prop)"]-->Type["Sort 1
                                    (Type / Type 0)"];
@@ -339,9 +340,8 @@ graph TD;
     e1@{ animation: fast }
 ```
 
-
-So, how do we make `id'` work on with _any_ universe level? We do this by making
-the type argument _polymorphic_.
+So, how do we make `id'` work on with _any_ universe level? We do this by 
+making the type argument _polymorphic_.
 
 ~~~admonish example title=""
 ```lean
@@ -444,9 +444,10 @@ false
 ~~~
 
 Wahey! That's more like it. Now we can have two different types for `a` and
-`b`. But there is yet another unecessary constraint on `a` and `b`!
+`b`.
 
-The constraint we've accidentally introduced, is that `α` and `β` must be the 
+But, I've added yet another unnecessary constraint on `a` and `b`!
+The constraint I've accidentally introduced is that `α` and `β` must be the 
 same universe level!
 
 ~~~admonish bug title="Bad universe level"
@@ -484,12 +485,15 @@ to have independent universe levels! So we can reduce the code simply to:
 def const {α β} (a : α) (_ : β) := a
 ```
 
-(Note: the usage of the hole term instead of `b`! 
-This is a very common stylistic choice to denote that we don't care about this 
-argument and don't use it.)
+(Note: the usage of the hole term instead of `b`! Using the hole term for an
+argument name is a common stylistic choice to show we don't care about an
+argument and won't be using it in the definition.)
 
 ~~~
 
+
+There you have it! The `const` function we wrote is the same 
+as the `const` function found in `Function.const` in Lean.
 
 <!--
 

@@ -9,7 +9,7 @@ git-repository-url = "https://github.com/aneilmac/lean4TheWin/tree/main/src"
 [output.html]
 mathjax-support = true
 additional-css = ["./theme/mdbook-admonish.css"]
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = ["./theme/mermaid.min.js", "./theme/mermaid-init.js"]
 
 [preprocessor.admonish]
 command = "mdbook-admonish"
