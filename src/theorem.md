@@ -17,178 +17,122 @@
 
 ## What is a theorem
 
-A theorem is proposition alongside a _proof_ that the 
-proposition is true.
+Over the past couple of chapters I have been obsessively talking about types.
+And there was a reason we had to become comfortable with types to be able to
+prove things in Lean.
 
-But what is true?
+Lean is built on the Curry-Howard isomorphism. To summarize: a theorem can be
+converted to a function. If the type of the function is the _proposition_, then
+having a definition for that function, would be the _proof_ that the proposition 
+is true.
 
-### A recap of boolean truthiness
+## The `Prop` type
 
-Working wither other software packages you'll be very familiar with boolean logic. Lean has a `Bool` type, which works exactly as you might expected
+Previously we've learned about the existence of universes, or sorts in Lean.
 
+We understand that all our "common" or computable types live in the `Type` 
+universe (`Sort 1`). And that `Type` lives in `Type 1`, and `Type 1` lives in
+`Type 2` and so on.
+
+So far, this has been of little practicle use! If all our types live in `Type`,
+then all we have to care about is `Type`!
+
+
+But now we enter theorem proving, we need to know about `Prop`.
+`Prop` is an alias for `Sort 0`, the lowest possible universe level in Lean. 
+Much like you have types in `Type`, you have propositions in `Prop`. Here's
+some examples:
+
+~~~admonish example title=""
 ```lean
-#check true -- (true : Bool)
-#check false -- (false : Bool)
-
--- Bitwise AND logic
-#eval true && true   -- true
-#eval true && false  -- false
-#eval false && true  -- false
-#eval false && false -- false
-
--- Bitwise OR logic
-#eval true || true   -- true
-#eval true || false  -- true
-#eval false || true  -- true
-#eval false || false -- false
-
--- Bitwise NOT logic
-#eval !true    -- false
-#eval !false   -- true
-#eval !!true   -- true
-#eval !!false  --false
-
-# Bitwise equality
-#eval true == true   -- true
-#eval true == false  -- false
-#eval false == true  -- false
-#eval false == false -- true
+#check True
 ```
-
-So far, nothing surprising: we have a `Bool` type,
-and some common operators that work on Bools. The
-`Bool` type is ubiqiutous in programming languages,
-even in those languages that don't necessarily have types.
-`Bool` is the building block on which your programs run.
-
-You might be surprised that Lean has another "truthy" type
-called `Prop`. While `Bool` is used for _execution_ (i.e. `#eval`),
-and for running programs. `Prop` is used for theorem proving and _proving_
-programs.
-
-```lean 
-#check True  -- (True : Prop)
-#check False -- (False : Prop)
-
--- Note the use of `=`, and not `==`!
-#check True = False -- (True = True : Prop)
-```
-
-There are some implicit conversions between `Bool` and `Prop`. If we try to 
-`#eval` a Prop, it will be converted into a `Bool`!
-
-~~~admonish example title =""
-```lean
-#eval True
-```
-true
+3 = 3 : Prop
 ~~~
 
-Notice that uppercase `True` (`Prop`) has been converted to
-lowercase `true` (`Bool`) when we try to _evaluate_ `True`.
+Don't be fooled into thinking this is the same as `3 == 3`!
+`3 == 3` is a _computable_ operation that results in `(true : Bool)`.
 
-
-Well that's confusing! You might ask: "why?"
-What's wrong with `Bool`? Why do we need a different truthy-type for theorem proving?
-
-And that's a good question!
-To understand the why, 
-we need to understand how solver engines like Lean work.
-Fundamentally, there is a crucial assumption hidden inside 
-`Bool` which can _crash_ solver engines, causing them to get stuck
-indefinitely! This is known as the _Halting Problem_.
-
-This assumption will be revealed in an exciting who-dunnit-like reveal later on. For now, you just need to understand a difference exists. 
-
-There is a nasty _gotcha_ with boolean logic when it comes to reasoning engines like Lean.
-
-What you may be surprised to learn is there is another
-truthy-type in Lean, called `Prop`, which is more appropriate for theorem proving.
+`3 = 3` (note the single equals), is a _proposition_ that \\(3\\) is equal to
+\\(3\\). Think of it more like a type. Let's try proving it.
 
 ## Theorem Proving
 
-If I ask you to prove to me `5 = 5`, how would you go about this?
-It's such as _obvious_ statement, you might get utterly stuck.
-It's obvious innit? Here's how we'd go about it in Lean:
+Here is a very simple Lean proof:
 
 ```lean
-theorem five_eq_five : 5 = 5 := rfl
+theorem three_eq_three : 3 = 3 := rfl
 ```
 
-Tada! A groundbreaking _proven_ theorem that `5=5`.
+Tada! A groundbreaking _proven_ theorem that `3 = 3`.
 
-You might of course, not believe me. How does writing the above
-line prove anything?
+If you squint, you can see how this is similar to how we use `def name := ...`.
 
-Lean is built on a fancy-named theory called the 
-_Curry-Howard isomorphism_. This theory tells us that
-a mathematical theory can be converted to a program function, 
-and vice-versa.
-
-In Lean, the Proposition `5 = 5` is the _type_ of the function. 
-`rfl` is the _definition_.
+We have `three_eq_three` which is our theorem name, `3 = 3`, which is our type,
+and `rfl` which is our proof that `3 = 3`. (I'll explain `rfl` later!)
 
 Crucially, the program compiles, and the Lean infoview tells you
-everything is great! In Lean, because the function compiles, 
-the theory must be true. 
+everything is great! Because the function is valid, then theory must be true. 
 
-And that really is what theorem proving boils down to in Lean,
-you write a function, the type is a proposition you want to prove,
-and if you can write a function-body which compiles, then the 
-theorem is true!
+Let's consider another prop:
 
-Here's an attempt to prove soemthing obviously false:
+~~~admonish example title=""
+```lean
+#check True
+```
+3 = 5 : Prop
+~~~
+
+`3 = 5` is demonstrably **false**! 
+But being a false statement doesn't mean `3 = 5` isn't a valid proposition! 
+Propositions can be true _or_ false. What confirms a proposition true is the 
+_proof_ a.k.a the function definition. You'll see we can't prove `3 = 5` the
+same way we proved `3 = 3`:
 
 ~~~admonish bug
 ```lean
-theorem five_eq_six : 5 = 6 := rfl
+theorem three_eq_five : 3 = 5 := rfl
 ```
-
 Not a definitional equality: the left-hand side  
-&nbsp;&nbsp;5  
+&nbsp;&nbsp;3  
 is not definitionally equal to the right-hand side  
-&nbsp;&nbsp;6
+&nbsp;&nbsp;5
 ~~~
 
-Now, Lean gives us a compiler error. \\(5\\) is most definitely *not* equal
-to \\(6\\). We can put whatever we want in the definition, but if it
-doesn't compile - then it's not a valid theorem.
+The false theorem doesn't compile, and yo get an error message.
 
-~~~admonish info
-The idea of _compiling_ rather than _executing_ is an important distinction here. 
-`five_eq_five` only needs to compile. We would never execute the function.
+Now, bear in mind, an error message **does not mean a theory is false**.
+An error message _only_ means that the theory is not valid. To prove `3 = 5` 
+is false, we would require a proof of the following proposition:
 
-In-fact, if we try `#eval five_eq_five` we'll get an error:
-"cannot evaluate, proofs are not computationally relevant".
+~~~admonish example title =""
+```lean
+#check 3 ≠ 5 
+```
+3 ≠ 5 : Prop
 ~~~
 
-~~~admonish info
-I keep referring to `theorem five_eq_five : 5 = 5 := rfl` as a _function_,
-because it really is.
+Which we will cover in later chapters about contradictions and falseness.
 
-Cast your mind back to a function definition 
+## The `rfl` proof
 
-`def name : Type := ...`.
+If I asked you to prove that `3 = 3`, it's likely you'll get stumped by this
+question.
 
-The syntax for a definition is the exact same as the definition 
-for a theorem. Under the hood `theorem` will convert to 
-`noncomputable def`.
+After all, isn't it obvious? Isn't the proof just "well _look_, how can it 
+not be?" What more do you expect from me?
 
-`noncomputable` is a keyword that tells Lean a function is never executed,
-only ever compiled. We'll be exploring `noncomputable` later on, as it's
-useful for writing say, an _exact_ definition for pi, that a computer could never 
-execute, but could reason about.
-~~~
+`rfl` stands for _reflexivity_. Reflexivity is a fancy way of saying that 
+for any, `a`, `a = a` is true. It is the definition of equality in Lean.
 
-The question remains: what is `rfl`? 
-`rfl` stands for _reflexivity_, which is theorem that
-tells us that if the symbols on the left-hand side of propositional equality is equal to the right hand side, then a theorem is true!
+`rfl` is more powerful than you might think. `a` can be as complex a statement
+as you like, as long as both sides are equal, then the proposition must be true
+by reflexivity. 
 
-This works for anything, as long as the symbols match exactly
 
 ```lean
 theorem example_one : 23 + 5 = 23 + 5 := rfl
 
 theorem example_two : 150 * 3 - 456 = 150 * 3 - 456 := rfl
 ```
-]
+

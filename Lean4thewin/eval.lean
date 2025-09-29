@@ -124,4 +124,14 @@ def id' {α} (x : α) := x
 
 def const {α β} (a : α) (b : β) := a
 
+#check const
+
 #eval const false Type
+
+#check List
+
+#print List.filter
+
+--#eval List.filter (fun x => x % 5 == 0 || x % 7 == 0) (List.range 100)
+
+noncomputable def five_neq_six : 3 ≠ 5 := fun _ => by contradiction

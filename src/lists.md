@@ -468,11 +468,10 @@ remember `const` from the previous chapter).
 ~~~
 
 Here, `Function.const true : β -> Bool`, perfectly fits the type signature 
-of `p : α -> Bool`. It doesn't matter that `α` `β` have different names!
-`α` is any `Type u` and `β` is any `Type u`. 
-How they were named when writing the signatures makes no difference.
+of `p : Nat -> Bool`. Lean's powerful type guessing will set `β` to `Nat` for 
+us.
 
-Going a step further. Let's consider we have a function on `List Nat`, which
+Here's another example. Let's consider we have a function on `List Nat`, which
 produces a new list, returning only those numbers which are even:
 
 ```lean
@@ -488,6 +487,59 @@ def evens' := List.filter (fun x => x % 2 == 0)
 
 Here, `evens'` is defined as a partial application `List.filter`. 
 When the final input parameter is provided, you'll get the even-number list!
+
+## The `map` function
+
+Let's say we want to convert a number to a string. We would use the `toString`
+function.
+
+~~~admonish example title=""
+```lean
+#eval toString 4
+```
+"4"
+~~~
+
+So how do we change a list of numbers to a list of strings?
+
+This is where we can use `List.map`
+
+~~~admonish example title=""
+```lean
+#check List.map
+```
+List.map {α β} (f : α → β) (l : List α) : List β
+~~~
+
+`List.map` takes a function `f: α → β`, and a list `l : List α`, and produces
+a new `List β`. In effect, `List.map` applies `f` to each element in `l`, and 
+returns the output as a new list. We can slot `toList` in there easily.
+
+~~~admonish example title=""
+```lean
+#eval List.map toString (List.range 10)
+```
+["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+~~~
+
+`map` is a very flexible function, and allows for any function expression
+that confirms to the type signature. As you can see the type `β` can be derived
+entirely from the signature of `f`.
+
+~~~admonish example title=""
+```lean
+#eval List.map fun (x => x % 2 == 0) (List.range 10)
+```
+[true, false, true, false, true, false, true, false, true, false]
+~~~
+
+~~~admonish example title=""
+```lean
+#eval List.map (Function.const 7) (List.range 10)
+```
+[7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+~~~
+
 
 <!--
 
