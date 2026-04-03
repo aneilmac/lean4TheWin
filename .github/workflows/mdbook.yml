@@ -43,7 +43,7 @@ jobs:
           cargo install --version ${MDBOOK_MERMAID_VERSION} mdbook-mermaid
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Build with mdBook
         run: mdbook build
       - name: Upload artifact
