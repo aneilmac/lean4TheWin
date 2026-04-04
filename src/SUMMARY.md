@@ -31,4 +31,8 @@
 
 ---
 
+[Interactive demo](./demo-interactive.md)
+
+---
+
 [Symbols](./symbols.md)

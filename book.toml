@@ -1,19 +1,21 @@
 [book]
 authors = ["Archibald Neil MacDonald"]
 language = "en"
-multilingual = false
 src = "src"
 title = "Lean 4 the Win"
-git-repository-url = "https://github.com/aneilmac/lean4TheWin/tree/main/src"
 
 [output.html]
 mathjax-support = true
-additional-css = ["./theme/mdbook-admonish.css"]
-additional-js = ["./theme/mermaid.min.js", "./theme/mermaid-init.js"]
+additional-css = ["./theme/mdbook-admonish.css", "theme/lean-interactive-view.css"]
+additional-js = ["./theme/mermaid.min.js", "./theme/mermaid-init.js", "theme/lean-interactive-view.js"]
 
-[preprocessor.admonish]
-command = "mdbook-admonish"
-assets_version = "3.1.0" # do not edit: managed by `mdbook-admonish install`
+# [preprocessor.admonish]
+# command = "mdbook-admonish"
+# assets_version = "3.1.0" # do not edit: managed by `mdbook-admonish install`
+
+[preprocessor.interactive-lean-view]
+command = "cargo run --manifest-path=interactive-lean-view/Cargo.toml --locked"
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
+

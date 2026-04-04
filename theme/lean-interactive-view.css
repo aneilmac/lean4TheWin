@@ -1,0 +1,37 @@
+.interactive-lean {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.interactive-lean pre {
+  margin: 0;
+}
+
+.interactive-lean-context{
+}
+
+.interactive-line {
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.interactive-line:hover {
+  background-color: #f0f0f0;
+  cursor: pointer
+}
+
+.interactive-line.active {
+  background-color: #d0e0ff;
+}
+
+.lean-context-line {
+  position: absolute;
+  height: 100%;
+  overflow: auto;
+  display: none;
+}
+
+.lean-context-line.active {
+  display: block;
+}
