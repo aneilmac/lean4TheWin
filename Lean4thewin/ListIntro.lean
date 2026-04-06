@@ -34,11 +34,33 @@ inductive MyList where
   | cons (head : Int64) (tail : MyList) : MyList
 
 
+-- ANCHOR: my_theory
 theorem my_theory {α β γ : Prop} (h : α -> β) (g: β -> γ) : (α -> γ) := by
+  --## α β γ : Prop
+  --## h : α → β
+  --## g : β → γ
+  --## ⊢ α → γ
   intro a
+  --## α β γ : Prop
+  --## h : α → β
+  --## g : β → γ
+  --## a : α
+  --## ⊢ γ
   apply g
+  --## α β γ : Prop
+  --## h : α → β
+  --## g : β → γ
+  --## a : α
+  --## ⊢ β
   apply h
+    --## α β γ : Prop
+  --## h : α → β
+  --## g : β → γ
+  --## a : α
+  --## ⊢ α
   exact a
+  --## No goals
+-- ANCHOR_END: my_theory
 
 
 def a := 15

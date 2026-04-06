@@ -1,12 +1,13 @@
-//! Splits a `lean-interactive` code section into a `lean` code section
-//! And the context elements where applicable.
-
 use mdbook_preprocessor::book::{Book, Chapter};
 use mdbook_preprocessor::errors::Result;
 use mdbook_preprocessor::{Preprocessor, PreprocessorContext};
-use pulldown_cmark::{Event, Parser, Tag, TagEnd, CodeBlockKind, CowStr};
+
+use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, TagEnd};
 use std::collections::HashMap;
+use html_escape::encode_text_to_string;
 use std::io;
+
+const CONTEXT_PREFIX: &str = "--##";
 
 fn main() {
     let mut args = std::env::args().skip(1);
@@ -36,7 +37,7 @@ impl Preprocessor for LeanView {
     }
 
     fn run(&self, _ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
-        book.for_each_chapter_mut(|ch| match generate_lean_view(ch) {
+        book.for_each_chapter_mut(|ch| match process_chapter(ch) {
             Ok(s) => ch.content = s,
             Err(e) => eprintln!("failed to process chapter: {e:?}"),
         });
@@ -44,89 +45,90 @@ impl Preprocessor for LeanView {
     }
 }
 
-fn generate_lean_view(chapter: &mut Chapter) -> Result<String> {
-    let parser = Parser::new(&chapter.content);
+fn process_chapter(ch: &Chapter) -> Result<String> {
+    let parser = Parser::new(&ch.content);
 
     let mut events = Vec::new();
-    let mut line_count: usize = 1;
-    let mut in_target_block = false;
-    let mut code_buffer = String::new();
-    let mut context_buffer = HashMap::<usize, CowStr>::new();
+
+    let mut in_block = false;
+    let mut code_lines: Vec<String> = Vec::new();
+    let mut context: HashMap<usize, Vec<String>> = HashMap::new();
+    let mut line_no = 1;
+
     for event in parser {
         match event {
-            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(info))) => {
-                if info.trim() == "lean-interactive"
-                {
-                    in_target_block = true;
-                    code_buffer.clear();
-                    context_buffer.clear();
-                }
-                else {
-                    events.push(Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(info))));
-                }
+            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(info)))
+                if info.trim() == "lean-interactive" =>
+            {
+                in_block = true;
+                code_lines.clear();
+                context.clear();
+                line_no = 1;
             }
-            Event::End(TagEnd::CodeBlock) if in_target_block => {
+
+            Event::End(TagEnd::CodeBlock) if in_block => {
                 events.push(Event::HardBreak);
-                events.push(Event::Html(CowStr::from(r#"<div class="interactive-lean">"#)));
-                
-                events.push(Event::Html(CowStr::from(r#"<div class="interactive-lean-code">"#)));
-                events.push(Event::Html(CowStr::from("<pre>")));
-                events.push(Event::Html(CowStr::from(r#"<code class="language-lean hljs">"#)));
-                events.push(Event::Html(CowStr::from(code_buffer.clone())));
-                events.push(Event::Html(CowStr::from("</code>")));
-                events.push(Event::Html(CowStr::from("</pre>")));
-                events.push(Event::Html(CowStr::from("</div>")));
-
-                events.push(Event::Html(CowStr::from(r#"<div class="interactive-lean-context">"#)));
-                for (line_num, context_line) in context_buffer.iter() {
-                    events.push(Event::Html(CowStr::from(format!(
-                        r#"<div class="lean-context-line" data-line="{}"><pre><code>{}</code></pre></div>"#,
-                        line_num, context_line
-                    ))));
-                }
-
-                events.push(Event::Html(CowStr::from(r#"</div>"#)));
-                events.push(Event::Html(CowStr::from(r#"</div>"#)));
-                in_target_block = false;
-
+                events.push(Event::Html(render_block(&code_lines, &context).into()));
+                in_block = false;
             }
 
-            Event::Text(text) if in_target_block => {
-                eprintln!("TEXT: {text}");
-                if text.trim_start().starts_with("--##")
-                {
-                    if context_buffer.contains_key(&line_count)
-                    {
-                         context_buffer.insert(line_count, 
-                            CowStr::from(context_buffer[&line_count].to_string() + &text));
-                    } 
-                    else 
-                    {
-                        context_buffer.insert(line_count, text);   
+            Event::Text(text) if in_block => {
+                for line in text.lines() {
+                    if let Some(idx) = line.find(CONTEXT_PREFIX) {
+                        let msg = line[idx + CONTEXT_PREFIX.len()..].trim().to_string();
+                        context.entry(line_no).or_default().push(msg);
+                    } else {
+                        code_lines.push(line.to_string());
+                        line_no += 1;
                     }
                 }
-                else 
-                {
-                    line_count += 1;
-                    code_buffer.push_str(&text);                    
-                }
             }
-            other => {
-                events.push(other);
-            }
+
+            // swallow everything inside target block
+            _ if in_block => {}
+            // normal passthrough
+            other => events.push(other),
         }
     }
 
     let mut out = String::new();
     pulldown_cmark_to_cmark::cmark(events.into_iter(), &mut out)?;
-
     Ok(out)
 }
 
-pub fn handle_preprocessing() -> Result<()> {
-    let pre = LeanView;
+fn render_block(code: &[String], context: &HashMap<usize, Vec<String>>) -> String {
+    let mut escaped_code = String::new();
+    encode_text_to_string(&code.join("\n"), &mut escaped_code, );
+
+    let mut context_html = String::new();
+
+    for (line, messages) in context {
+        let mut escaped = String::new();
+        encode_text_to_string(&messages.join("\n"), &mut escaped, );
+
+        context_html.push_str(&format!(
+            r#"<div class="lean-context-line" data-line="{}"><pre><samp>{}</samp></pre></div>"#,
+            line, escaped
+        ));
+    }
+
+    format!(
+        r#"<div class="interactive-lean">
+<div class="interactive-lean-code">
+<pre><code class="language-lean hljs">{}</code></pre>
+</div>
+<div class="interactive-lean-context">
+{}
+</div>
+</div>"#,
+        escaped_code,
+        context_html
+    )
+}
+
+fn handle_preprocessing() -> Result<()> {
     let (ctx, book) = mdbook_preprocessor::parse_input(io::stdin())?;
-    let processed_book = pre.run(&ctx, book)?;
-    serde_json::to_writer(io::stdout(), &processed_book)?;
+    let processed = LeanView.run(&ctx, book)?;
+    serde_json::to_writer(io::stdout(), &processed)?;
     Ok(())
 }

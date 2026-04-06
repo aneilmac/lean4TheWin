@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".interactive-lean").forEach(container => {
-    const pre = container.querySelector("pre");
     const code = container.querySelector("code");
     const context = container.querySelector(".interactive-lean-context");
 

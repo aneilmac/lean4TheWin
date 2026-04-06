@@ -4,6 +4,9 @@ language = "en"
 src = "src"
 title = "Lean 4 the Win"
 
+[build]
+extra-watch-dirs = ["Lean4thewin", "interactive-lean-view"]
+
 [output.html]
 mathjax-support = true
 additional-css = ["./theme/mdbook-admonish.css", "theme/lean-interactive-view.css"]
@@ -14,6 +17,7 @@ additional-js = ["./theme/mermaid.min.js", "./theme/mermaid-init.js", "theme/lea
 # assets_version = "3.1.0" # do not edit: managed by `mdbook-admonish install`
 
 [preprocessor.interactive-lean-view]
+after = [ "links" ]
 command = "cargo run --manifest-path=interactive-lean-view/Cargo.toml --locked"
 
 [preprocessor.mermaid]

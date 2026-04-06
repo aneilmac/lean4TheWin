@@ -1,3 +1,4 @@
+
 .interactive-lean {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -8,28 +9,34 @@
   margin: 0;
 }
 
-.interactive-lean-context{
-}
-
 .interactive-line {
   display: inline-block;
   transition: background-color 0.2s ease;
 }
 
 .interactive-line:hover {
-  background-color: #f0f0f0;
+  background-color: var(--quote-bg);
   cursor: pointer
 }
 
 .interactive-line.active {
-  background-color: #d0e0ff;
+  background-color: var(--quote-bg);
+}
+
+.interactive-lean-context{
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--quote-bg);
+  font-family: var(--mono-font);
 }
 
 .lean-context-line {
   position: absolute;
   height: 100%;
-  overflow: auto;
+  width: 100%;
   display: none;
+  overflow: hidden;
 }
 
 .lean-context-line.active {
